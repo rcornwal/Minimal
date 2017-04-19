@@ -584,6 +584,9 @@ protected:
 //
 
 // An example application that renders a simple cube
+
+//#include "Room.h"
+
 class ExampleApp : public RiftApp {
 	std::shared_ptr<GameScene> cubeScene;
 
