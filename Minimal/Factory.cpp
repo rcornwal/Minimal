@@ -26,5 +26,6 @@ void Factory::Render(glm::mat4 view, glm::mat4 proj) {
 	
 	//glm::mat4 matWVP = proj * view * GetModelMatrix();
 	//glUniformMatrix4fv(glGetUniformLocation(factoryShader.Program, "matWVP"), 1, GL_FALSE, glm::value_ptr(matWVP));
+	//test
 }
 
