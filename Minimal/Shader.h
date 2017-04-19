@@ -44,7 +44,7 @@ public:
 			fragmentCode = fShaderStream.str();
 		}
 		catch (ifstream::failure e){
-			cout << "ERROR, SHADER FILE NOT SUCCESFFULY READ" << endl;
+			OutputDebugString("\nERROR, SHADER FILE NOT SUCCESFFULY READ\n");
 		}
 		const GLchar* VShaderCode = vertexCode.c_str();
 		const GLchar* FShaderCode = fragmentCode.c_str();
@@ -60,7 +60,7 @@ public:
 		glGetShaderiv(vertex, GL_COMPILE_STATUS, &success);
 		if (!success) {
 			glGetShaderInfoLog(vertex, 512, NULL, infoLog);
-			cout << "ERROR - VERTEX SHADE RCOMPILATION FAILED\n" << infoLog << endl;
+			OutputDebugString("\nERROR - VERTEX SHADER COMPILATION FAILED\n");
 		}
 		// Fragment Shader
 		fragment = glCreateShader(GL_FRAGMENT_SHADER);
@@ -70,7 +70,7 @@ public:
 		glGetShaderiv(fragment, GL_COMPILE_STATUS, &success);
 		if (!success) {
 			glGetShaderInfoLog(fragment, 512, NULL, infoLog);
-			cout << "ERROR - FRAGMENT SHADE RCOMPILATION FAILED\n" << infoLog << endl;
+			OutputDebugString("\nERROR - FRAG SHADER COMPILATION FAILED\n");
 		}
 		// The Shader Program
 		this->Program = glCreateProgram();
@@ -81,7 +81,8 @@ public:
 		glGetProgramiv(this->Program, GL_LINK_STATUS, &success);
 		if (!success) {
 			glGetProgramInfoLog(this->Program, 512, NULL, infoLog);
-			cout << "ERROR - SHADER PROGRAM LINKING FAILED" << infoLog << endl;
+			OutputDebugString("\nERROR - SHADER PROGRAM LINKING FAILED\n");
+			OutputDebugString(infoLog);
 		}
 		// The shaders are linked to the program and are no longer needed
 		glDeleteShader(vertex);

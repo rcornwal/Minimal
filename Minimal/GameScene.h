@@ -50,6 +50,8 @@ using glm::quat;
 #include <oglplus/shapes/wrapper.hpp>
 #pragma warning( default : 4068 4244 4267 4065)
 
+#include "Factory.h"
+
 namespace Attribute {
 	enum {
 		Position = 0,
@@ -109,6 +111,9 @@ class GameScene {
 	// VBOs for the cube's vertices and normals
 
 	const unsigned int GRID_SIZE{ 5 };
+
+private:
+	Factory factoryModel;
 
 public:
 	GameScene() : cube({ "Position", "Normal" }, oglplus::shapes::Cube()) {
@@ -174,5 +179,8 @@ public:
 		Uniform<mat4>(prog, "CameraMatrix").Set(modelview);
 		vao.Bind();
 		cube.Draw(instanceCount);
+
+		OutputDebugString("\nRendering the factory...\n");
+		factoryModel.Render(modelview, projection);
 	}
 };

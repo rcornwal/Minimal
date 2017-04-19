@@ -32,11 +32,15 @@ public:
 private:
 	/* Data */
 	Model factoryModel;
-	GLchar* pathToFactory = "";
-	GLchar* vertexShaderPath = "";
-	GLchar* fragShaderPath = "";
+	GLchar* pathToFactory = "./Models/factory1/factory1.obj";
+	GLchar* vertexShaderPath = "./Models/factory1/factory.vs";
+	GLchar* fragShaderPath = "./Models/factory1/factory.frag";
 	Shader factoryShader;
 
+	glm::vec3 position;
+	glm::vec3 rotation;
+	glm::vec3 scale;
+
 	/* Functions */
-	//glm::mat4 GetModelMatrix();
+	glm::mat4 GetModelMatrix();
 };
