@@ -36,6 +36,9 @@
     <ClCompile Include="CO2Molecule.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Laser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -60,6 +63,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CO2Molecule.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Laser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

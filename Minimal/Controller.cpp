@@ -12,7 +12,7 @@ Controller::Controller() {
 	Shader conS(vertexShaderPath, fragShaderPath);
 	controllerShader = conS;
 
-	// Creates the model for the factory
+	// Creates the model for the controller
 	Model conM (pathToController);
 	controllerModel = conM;
 
@@ -54,8 +54,7 @@ void Controller::Render(glm::mat4 view, glm::mat4 proj) {
 	glUniformMatrix4fv(glGetUniformLocation(controllerShader.Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
 	glUniformMatrix4fv(glGetUniformLocation(controllerShader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(proj));
 
-
 	controllerModel.Draw(controllerShader);
-
+	laser.Render(view, proj);
 }
 

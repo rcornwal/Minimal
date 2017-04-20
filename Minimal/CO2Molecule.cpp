@@ -44,10 +44,17 @@ void CO2Molecule::Render(glm::mat4 view, glm::mat4 proj) {
 	Model rotate_model;
 
 	// Calculate the toWorld matrix for the model
-	glm::mat4 model;
-	model = glm::translate(model, glm::vec3(0.0f, -0.75f, -2.0f));
-	model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));
-	glRotatef(1, 0, 0, 1);
+	// Apply the appropriate transformations for animations. 
+	if (init) {
+		model = glm::translate(model, spawn_point);
+		model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));
+		init = false;
+	}
+
+	model = glm::translate(model, glm::vec3(0.0f, 0.01f, 0.0f));
+	model = glm::rotate(model, 0.01f, glm::vec3(0, 1, 1));
+	tick++;
+
 	glUniformMatrix4fv(glGetUniformLocation(co2Shader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
 	glUniformMatrix4fv(glGetUniformLocation(co2Shader.Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
 	glUniformMatrix4fv(glGetUniformLocation(co2Shader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(proj));

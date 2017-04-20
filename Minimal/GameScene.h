@@ -18,6 +18,8 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#define MAX_MOLECULES 10
+
 #define FAIL(X) throw std::runtime_error(X)
 
 // Import the most commonly used types into the default namespace
@@ -41,9 +43,13 @@ class GameScene {
 private:
 
 	Factory factoryModel;
-	CO2Molecule co2MoleculeModel;
+	CO2Molecule moleculeContainer[MAX_MOLECULES];
+	CO2Molecule molecule;
 	Controller leftController;
 	Controller rightController;
+
+	int lastUsedMolecule = 0;
+	int tick = 0;
 
 public:
 
@@ -59,8 +65,25 @@ public:
 
 	void render(const mat4 & projection, const mat4 & modelview) {
 
-		factoryModel.Render(modelview, projection);
-		co2MoleculeModel.Render(modelview, projection);
+		//factoryModel.Render(modelview, projection);
+		
+		// Set a new molecule to active every second (oculus should have 90 fps)
+		if (tick == 1000) {
+			moleculeContainer[lastUsedMolecule].active = true;
+			lastUsedMolecule++;
+			lastUsedMolecule %= MAX_MOLECULES;
+			tick = 0;
+		}
+		tick++;
+		
+		// Render all the active molecules
+		for (int i = 0; i < MAX_MOLECULES; ++i) {
+			if (moleculeContainer[i].active) {
+				moleculeContainer[i].Render(modelview, projection);
+			}
+		}
+
+		
 
 		leftController.position = hmdData.leftControllerPos;
 		leftController.rotation = hmdData.leftControllerOrientation;

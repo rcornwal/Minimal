@@ -1,3 +1,7 @@
+/////////////////////
+// Laser.h
+/////////////////////
+
 #pragma once
 #include <Windows.h>
 #include "Shader.h"
@@ -22,29 +26,20 @@
 #include <glm/gtx/quaternion.hpp>
 #include <GL/glew.h>
 
-class CO2Molecule {
+class Laser {
 public:
-	CO2Molecule();
+	glm::vec3 position;
+	glm::vec4 rotation;
+	glm::vec3 scale;
+
+	Laser();
 	void Render(glm::mat4 view, glm::mat4 proj);
-	bool active = false; // makes sure the molecule is active before spawning
+	void Draw();
 
 private:
 	/* Data */
-	Model co2Model;
-	GLchar* pathToFactory = "./Models/co2/co2.obj";
-	GLchar* vertexShaderPath = "./Models/co2/co2.vs";
-	GLchar* fragShaderPath = "./Models/co2/co2.frag";
-	Shader co2Shader;
+	GLchar* vertexShaderPath = "./Models/laser/laser.vs";
+	GLchar* fragShaderPath   = "./Models/laser/laser.frag";
+	Shader laserShader;
 
-	bool init = true;
-	int tick = 0;
-
-	glm::vec3 spawn_point = glm::vec3(0.0f, -0.75f, -2.0f);
-	glm::vec3 position;
-	glm::vec3 rotation;
-	glm::vec3 scale;
-	glm::mat4 model;
-
-	/* Functions */
-	glm::mat4 GetModelMatrix();
 };

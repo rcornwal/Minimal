@@ -6,6 +6,7 @@
 #include <Windows.h>
 #include "Shader.h"
 #include "Model.h"
+#include "Laser.h"
 
 // Std includes
 #include <stdio.h>
@@ -36,6 +37,7 @@ public:
 	void Render(glm::mat4 view, glm::mat4 proj);
 private:
 	/* Data */
+	Laser laser;
 	Model controllerModel;
 	GLchar* pathToController = "./Models/wand/wand.obj";
 	GLchar* vertexShaderPath = "./Models/wand/wand.vs";
