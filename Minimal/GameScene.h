@@ -33,6 +33,7 @@ using glm::quat;
 
 #include "Factory.h"
 #include "Controller.h"
+#include "CO2Molecule.h"
 
 // a class for encapsulating building and rendering an RGB cube
 class GameScene {
@@ -40,6 +41,7 @@ class GameScene {
 private:
 
 	Factory factoryModel;
+	CO2Molecule co2MoleculeModel;
 	Controller leftController;
 	Controller rightController;
 
@@ -58,6 +60,7 @@ public:
 	void render(const mat4 & projection, const mat4 & modelview) {
 
 		factoryModel.Render(modelview, projection);
+		co2MoleculeModel.Render(modelview, projection);
 
 		leftController.position = hmdData.leftControllerPos;
 		leftController.rotation = hmdData.leftControllerOrientation;

@@ -131,6 +131,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CO2Molecule.cpp" />
     <ClCompile Include="Controller.cpp" />
     <ClCompile Include="Factory.cpp" />
     <ClCompile Include="GameScene.cpp" />
@@ -142,6 +143,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CO2Molecule.h" />
     <ClInclude Include="Controller.h" />
     <ClInclude Include="Factory.h" />
     <ClInclude Include="GameScene.h" />

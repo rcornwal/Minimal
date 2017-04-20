@@ -29,9 +29,9 @@ public:
 private:
 	/* Data */
 	Model co2Model;
-	GLchar* pathToFactory = "./Models/factory1/co2.obj";
-	GLchar* vertexShaderPath = "./Models/factory1/co2.vs";
-	GLchar* fragShaderPath = "./Models/factory1/co2.frag";
+	GLchar* pathToFactory = "./Models/co2/co2.obj";
+	GLchar* vertexShaderPath = "./Models/co2/co2.vs";
+	GLchar* fragShaderPath = "./Models/co2/co2.frag";
 	Shader co2Shader;
 
 	glm::vec3 position;
