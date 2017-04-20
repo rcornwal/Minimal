@@ -32,6 +32,7 @@ using glm::vec4;
 using glm::quat;
 
 #include "Factory.h"
+#include "Controller.h"
 
 // a class for encapsulating building and rendering an RGB cube
 class GameScene {
@@ -39,14 +40,31 @@ class GameScene {
 private:
 
 	Factory factoryModel;
+	Controller leftController;
+	Controller rightController;
 
 public:
+
+	struct hmdData {
+		glm::vec3 hmdPos;
+		glm::vec3 leftControllerPos;
+		glm::vec3 rightControllerPos;
+		glm::vec4 leftControllerOrientation;
+		glm::vec4 rightControllerOrientation;
+	} hmdData;
 
 	GameScene() {}
 
 	void render(const mat4 & projection, const mat4 & modelview) {
 
-		OutputDebugString("\nRendering the factory...\n");
 		factoryModel.Render(modelview, projection);
+
+		leftController.position = hmdData.leftControllerPos;
+		leftController.rotation = hmdData.leftControllerOrientation;
+		leftController.Render(modelview, projection);
+
+		rightController.position = hmdData.rightControllerPos;
+		rightController.rotation = hmdData.rightControllerOrientation;
+		rightController.Render(modelview, projection);
 	}
 };

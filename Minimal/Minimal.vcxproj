@@ -131,6 +131,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Controller.cpp" />
     <ClCompile Include="Factory.cpp" />
     <ClCompile Include="GameScene.cpp" />
     <ClCompile Include="main.cpp" />
@@ -141,11 +142,11 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Controller.h" />
     <ClInclude Include="Factory.h" />
     <ClInclude Include="GameScene.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Model.h" />
-    <ClInclude Include="Room.h" />
     <ClInclude Include="Shader.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -20,6 +20,7 @@ limitations under the License.
 
 #include <iostream>
 #include <memory>
+#include <string>
 #include <exception>
 #include <algorithm>
 #include <Windows.h>
@@ -439,16 +440,54 @@ private:
 	uvec2 _renderTargetSize;
 	uvec2 _mirrorSize;
 
+	ovrEyeRenderDesc EyeRenderDesc[2];
+
 public:
+
+	
+	void ConfigureRendering(const ovrFovPort * fov = 0)
+	{
+		// If any values are passed as NULL, then we use the default basic case
+		if (!fov) fov = ovr_GetHmdDesc(_session).DefaultEyeFov;
+		EyeRenderDesc[0] = ovr_GetRenderDesc(_session, ovrEye_Left, fov[0]);
+		EyeRenderDesc[1] = ovr_GetRenderDesc(_session, ovrEye_Right, fov[1]);
+	}
+
+	ovrTrackingState GetEyePoses(ovrPosef * useEyeRenderPose = 0, float * scaleIPD = 0, float * newIPD = 0)
+	{
+		// Get both eye poses simultaneously, with IPD offset already included. 
+		ovrVector3f useHmdToEyeOffset[2] = { EyeRenderDesc[0].HmdToEyeOffset, EyeRenderDesc[1].HmdToEyeOffset };
+
+		// If any values are passed as NULL, then we use the default basic case
+		//if (!useEyeRenderPose) useEyeRenderPose = EyeRenderPose;
+		if (scaleIPD)
+		{
+			useHmdToEyeOffset[0].x *= *scaleIPD;
+			useHmdToEyeOffset[1].x *= *scaleIPD;
+		}
+		if (newIPD)
+		{
+			useHmdToEyeOffset[0].x = -(*newIPD * 0.5f);
+			useHmdToEyeOffset[1].x = +(*newIPD * 0.5f);
+		}
+
+		double ftiming = ovr_GetPredictedDisplayTime(_session, 0);
+		ovrTrackingState trackingState = ovr_GetTrackingState(_session, ftiming, ovrTrue);
+
+		ovr_CalcEyePoses(trackingState.HeadPose.ThePose, useHmdToEyeOffset, useEyeRenderPose);
+
+		return(trackingState);
+	}
+	
 
 	RiftApp() {
 		using namespace ovr;
 		_viewScaleDesc.HmdSpaceToWorldScaleInMeters = 1.0f;
-
+		
 		memset(&_sceneLayer, 0, sizeof(ovrLayerEyeFov));
 		_sceneLayer.Header.Type = ovrLayerType_EyeFov;
 		_sceneLayer.Header.Flags = ovrLayerFlag_TextureOriginAtBottomLeft;
-
+		
 		ovr::for_each_eye([&](ovrEyeType eye) {
 			ovrEyeRenderDesc& erd = _eyeRenderDescs[eye] = ovr_GetRenderDesc(_session, eye, _hmdDesc.DefaultEyeFov[eye]);
 			ovrMatrix4f ovrPerspectiveProjection =
@@ -464,12 +503,15 @@ public:
 			_renderTargetSize.y = std::max(_renderTargetSize.y, (uint32_t)eyeSize.h);
 			_renderTargetSize.x += eyeSize.w;
 		});
+
 		// Make the on screen window 1/4 the resolution of the render target
 		_mirrorSize = _renderTargetSize;
 		_mirrorSize /= 4;
+
 	}
 
 protected:
+
 	GLFWwindow * createRenderingTarget(uvec2 & outSize, ivec2 & outPosition) override {
 		return glfw::createWindow(_mirrorSize);
 	}
@@ -543,9 +585,10 @@ protected:
 	}
 
 	void draw() final override {
+
 		ovrPosef eyePoses[2];
 		ovr_GetEyePoses(_session, frame, true, _viewScaleDesc.HmdToEyeOffset, eyePoses, &_sceneLayer.SensorSampleTime);
-
+		
 		int curIndex;
 		ovr_GetTextureSwapChainCurrentIndex(_session, _eyeTexture, &curIndex);
 		GLuint curTexId;
@@ -585,8 +628,6 @@ protected:
 
 // An example application that renders a simple cube
 
-//#include "Room.h"
-
 class ExampleApp : public RiftApp {
 	std::shared_ptr<GameScene> cubeScene;
 
@@ -594,9 +635,48 @@ public:
 	ExampleApp() { }
 
 protected:
+
+	glm::vec3 leftControllerPos() {
+		ovrTrackingState hmdState = GetEyePoses();
+		float x = hmdState.HandPoses[ovrHand_Left].ThePose.Position.x;
+		float y = hmdState.HandPoses[ovrHand_Left].ThePose.Position.y;
+		float z = hmdState.HandPoses[ovrHand_Left].ThePose.Position.z;
+		glm::vec3 pos(x, y, z);
+		return pos;
+	}
+
+	glm::vec3 rightControllerPos() {
+		ovrTrackingState hmdState = GetEyePoses();
+		float x = hmdState.HandPoses[ovrHand_Right].ThePose.Position.x;
+		float y = hmdState.HandPoses[ovrHand_Right].ThePose.Position.y;
+		float z = hmdState.HandPoses[ovrHand_Right].ThePose.Position.z;
+		glm::vec3 pos(x, y, z);
+		return pos;
+	}
+
+	glm::vec4 leftControllerOrientation() {
+		ovrTrackingState hmdState = GetEyePoses();
+		float x = hmdState.HandPoses[ovrHand_Left].ThePose.Orientation.x;
+		float y = hmdState.HandPoses[ovrHand_Left].ThePose.Orientation.y;
+		float z = hmdState.HandPoses[ovrHand_Left].ThePose.Orientation.z;
+		float w = hmdState.HandPoses[ovrHand_Left].ThePose.Orientation.w;
+		glm::vec4 rot(x, y, z, w);
+		return rot;
+	}
+
+	glm::vec4 rightControllerOrientation() {
+		ovrTrackingState hmdState = GetEyePoses();
+		float x = hmdState.HandPoses[ovrHand_Right].ThePose.Orientation.x;
+		float y = hmdState.HandPoses[ovrHand_Right].ThePose.Orientation.y;
+		float z = hmdState.HandPoses[ovrHand_Right].ThePose.Orientation.z;
+		float w = hmdState.HandPoses[ovrHand_Right].ThePose.Orientation.w;
+		glm::vec4 rot(x, y, z, w);
+		return rot;
+	}
+
 	void initGl() override {
 		RiftApp::initGl();
-		glClearColor(0.2f, 0.2f, 0.2f, 0.0f);
+		glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
 		glEnable(GL_DEPTH_TEST);
 		ovr_RecenterTrackingOrigin(_session);
 		cubeScene = std::shared_ptr<GameScene>(new GameScene());
@@ -607,6 +687,13 @@ protected:
 	}
 
 	void renderScene(const glm::mat4 & projection, const glm::mat4 & headPose) override {
+		
+		// pass in info about the hmd to our scene
+		cubeScene->hmdData.leftControllerPos = leftControllerPos();
+		cubeScene->hmdData.rightControllerPos = rightControllerPos();
+		cubeScene->hmdData.leftControllerOrientation = leftControllerOrientation();
+		cubeScene->hmdData.rightControllerOrientation = rightControllerOrientation();
+
 		cubeScene->render(projection, glm::inverse(headPose));
 	}
 };

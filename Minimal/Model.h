@@ -1,6 +1,8 @@
 /////////////////////
 // Model.h
 /////////////////////
+
+#pragma once
 #include <Windows.h>
 #include "Shader.h"
 #include "Mesh.h"
