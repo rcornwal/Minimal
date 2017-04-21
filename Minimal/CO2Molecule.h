@@ -29,16 +29,21 @@ public:
 	void Render(glm::mat4 view, glm::mat4 proj);
 	void setup();
 	bool active = false; // makes sure the molecule is active before spawning
+	bool isCO2 = true;
 	void ChangeToO2();
+	void ChangeToCO2();
 
-	glm::vec3 origPos;
 	glm::vec3 position;
 	float rotation;
 	glm::vec3 scale;
 
 	glm::vec3 random_vector;
+	glm::vec3 spawn_point = glm::vec3(0.0f, -0.75f, -1.5f);
+
+	glm::mat4 model;
 private:
 	/* Data */
+	Model currentModel;
 	Model co2Model;
 	Model o2Model;
 
@@ -52,9 +57,6 @@ private:
 
 	bool init = true;
 	int tick = 0;
-
-	glm::vec3 spawn_point = glm::vec3(0.0f, -0.75f, -1.5f);
-	glm::mat4 model;
 
 	glm::vec3 color;
 

@@ -19,6 +19,7 @@ CO2Molecule::CO2Molecule(Model co2M, Model o2M) {
 
 
 	// Creates the model for the factory
+	currentModel = co2M;
 	co2Model = co2M;
 	o2Model = o2M;
 
@@ -36,8 +37,13 @@ void CO2Molecule::setup() {
 }
 
 void CO2Molecule::ChangeToO2() {
-	co2Model = o2Model;
+	currentModel = o2Model;
 	color = glm::vec3(1.0f, 1.0f, 1.0f);
+}
+
+void CO2Molecule::ChangeToCO2() {
+	currentModel = co2Model;
+	color = glm::vec3(0.0f, 0.5f, 0.31f);
 }
 
 void CO2Molecule::Render(glm::mat4 view, glm::mat4 proj) {
@@ -60,7 +66,6 @@ void CO2Molecule::Render(glm::mat4 view, glm::mat4 proj) {
 		model = glm::translate(model, spawn_point);
 		model = glm::scale(model, glm::vec3(0.05f, 0.05f, 0.05f));
 		position = spawn_point;
-		origPos = spawn_point;
 		init = false;
 	}
 	
@@ -101,6 +106,6 @@ void CO2Molecule::Render(glm::mat4 view, glm::mat4 proj) {
 	glUniformMatrix4fv(glGetUniformLocation(co2Shader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(proj));
 
 
-	co2Model.Draw(co2Shader);
+	currentModel.Draw(co2Shader);
 
 }

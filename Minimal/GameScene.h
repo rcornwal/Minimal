@@ -51,13 +51,15 @@ private:
 	Factory factoryModel;
 	
 	CO2Molecule moleculeContainer[MAX_MOLECULES];
-	CO2Molecule startingMolecules[5];
 	
 	Controller leftController;
 	Controller rightController;
 
 	int lastUsedMolecule = 5;
 	int tick = 0;
+	int activeMolecules = 5;
+
+	int gameState = 0;
 
 public:
 
@@ -76,10 +78,7 @@ public:
 		for (int i = 0; i < MAX_MOLECULES; i++) {
 			moleculeContainer[i] = CO2Molecule(co2M, o2M);
 		}
-		for (int i = 0; i < 5; i++) {
-			startingMolecules[i] = CO2Molecule(co2M, o2M);
-			startingMolecules[i].active = true;
-		}
+
 	}
 
 	float intersection(glm::vec3 rayOrigin, glm::vec3 rayDir, glm::vec3 moleculePos, float radius) {
@@ -163,13 +162,31 @@ public:
 					numSelecting++;
 				}
 				
-				if (numSelecting == 2) {
+				if (numSelecting == 2 && moleculeContainer[i].isCO2 && gameState == 0) {
 					moleculeContainer[i].ChangeToO2();
+					moleculeContainer[i].isCO2 = false;
+					activeMolecules--;
 				}
 			}
 		}
 	}
 
+	void resetGame() {
+		glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
+		for (int i = 0; i < MAX_MOLECULES; i++) {
+			moleculeContainer[i].active = false;
+			moleculeContainer[i].isCO2 = true;
+			moleculeContainer[i].ChangeToCO2();
+			moleculeContainer[i].spawn_point = glm::vec3(0.0f, -0.75f, -1.5f);
+			moleculeContainer[i].model = glm::mat4(1.0f);
+			moleculeContainer[i].position = moleculeContainer[i].spawn_point;
+			moleculeContainer[i].rotation = 0;
+		}
+		activeMolecules = 5;
+		lastUsedMolecule = 5;
+		tick = 0;
+		gameState = 0;
+	}
 
 	void render(const mat4 & projection, const mat4 & modelview) {
 
@@ -177,13 +194,33 @@ public:
 		
 		// Set a new molecule to active every second (oculus should have 90 fps)
 
-		if (tick == 500) {
+		if (tick == 200) {
 			moleculeContainer[lastUsedMolecule].active = true;
+			activeMolecules++;
 			lastUsedMolecule++;
 			lastUsedMolecule %= MAX_MOLECULES;
 			tick = 0;
 		}
-		tick++;
+		if(gameState == 0) tick++;
+
+		// Check game state for game over or win
+		if (activeMolecules > 10 && gameState == 0) {
+			// looooose
+
+			for (int i = 0; i < MAX_MOLECULES; i++) {
+				moleculeContainer[i].active = true;
+				moleculeContainer[i].spawn_point = glm::vec3(rand() % 4 - 2, rand() % 4 - 2, rand() %4 - 2);
+				moleculeContainer[i].position = moleculeContainer[i].spawn_point;
+			}
+
+			glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+			gameState = 2;
+		}
+		else if (activeMolecules <= 0 && gameState == 0) {
+			// win!
+			gameState = 1;
+			glClearColor(135.0f / 255.0f, 206.0f / 255.0f, 250.0f / 255.0f, 1.0f);
+		}
 
 		// Render initial active molecules
 		for (int i = 0; i < 5; ++i) {
@@ -216,6 +253,11 @@ public:
 		rightController.position = hmdData.rightControllerPos;
 		rightController.rotation = hmdData.rightControllerOrientation;
 		rightController.Render(modelview, projection);
+
+		// Reset the game
+		if (gameState != 0 && hmdData.inputState.Buttons & ovrTouch_A) {
+			resetGame();
+		}
 
 		checkMoleculeIntersection();
 	}
