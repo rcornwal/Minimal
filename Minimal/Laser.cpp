@@ -18,7 +18,7 @@ Laser::Laser() {
 	// Set up the buffer arrays
 	vertices = {
 		0.0f,  0.0f, 0.0f,  // Top Right
-		0.0f, 65.0f, 0.0f  // Bottom Right
+		0.0f, laserDist, 0.0f  // Bottom Right
 	};
 
 	glGenVertexArrays(1, &this->VAO);
@@ -52,8 +52,6 @@ void Laser::Draw() {
 
 void Laser::Render(glm::mat4 view, glm::mat4 proj) {
 
-	OutputDebugString("Rendering laser...\n");
-
 	laserShader.Use();
 
 	GLint objectColorLoc = glGetUniformLocation(laserShader.Program, "objectColor");
@@ -73,5 +71,6 @@ void Laser::Render(glm::mat4 view, glm::mat4 proj) {
 	glUniformMatrix4fv(glGetUniformLocation(laserShader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(proj));
 
 	Draw();
+
 }
 

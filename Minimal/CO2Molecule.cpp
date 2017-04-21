@@ -4,7 +4,7 @@
 
 #include "CO2Molecule.h"
 
-#define BOUND 20.0f
+#define BOUND 1.2f
 
 /////////////////////////////////////////////////////
 
@@ -22,13 +22,15 @@ CO2Molecule::CO2Molecule(Model co2M, Model o2M) {
 	co2Model = co2M;
 	o2Model = o2M;
 
+	random_vector = glm::normalize(glm::vec3(rand(), rand(), rand()));
+
 	this->setup();
 }
 
 void CO2Molecule::setup() {
 	// Sets the position / rotation / scale
 	position = glm::vec3(0, 0, 0);
-	rotation = glm::vec3(0, 0, 0);
+	rotation = 0.0f;
 	scale = glm::vec3(1, 1, 1);
 	color = glm::vec3(0.0f, 0.5f, 0.31f);
 }
@@ -57,11 +59,11 @@ void CO2Molecule::Render(glm::mat4 view, glm::mat4 proj) {
 	if (init) {
 		model = glm::translate(model, spawn_point);
 		model = glm::scale(model, glm::vec3(0.05f, 0.05f, 0.05f));
+		position = spawn_point;
+		origPos = spawn_point;
 		init = false;
 	}
 	
-	glm::vec3 random_vector = glm::normalize(glm::vec3(rand(), rand(), rand()));
-
 	if (position.x >= BOUND) {
 		x_move = -x_move;
 	}
@@ -81,13 +83,17 @@ void CO2Molecule::Render(glm::mat4 view, glm::mat4 proj) {
 		z_move = -z_move;
 	}
 
-	glm::vec3 move = glm::normalize(glm::vec3(x_move, y_move, z_move)) * 0.03f;
+	glm::vec3 move = glm::normalize(glm::vec3(x_move, y_move, z_move)) * 0.003f;
 
-	model = glm::translate(model, move);
-	model = glm::rotate(model, 0.01f, random_vector);
+	glm::mat4 translate = glm::translate	(glm::mat4(1.0f), position+move);
+	glm::mat4 scale		= glm::scale		(glm::mat4(1.0f), glm::vec3(0.05f, 0.05f, 0.05f));
+	glm::mat4 rotate	= glm::rotate		(glm::mat4(1.0f), rotation+0.01f, random_vector);
 
-	position = position + move;
-	rotation = rotation + random_vector;
+	model = translate * scale * rotate;
+
+
+	position = model[3];
+	rotation += 0.01f;
 	tick++;
 
 	glUniformMatrix4fv(glGetUniformLocation(co2Shader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));

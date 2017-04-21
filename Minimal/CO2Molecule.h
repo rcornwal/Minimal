@@ -30,6 +30,13 @@ public:
 	void setup();
 	bool active = false; // makes sure the molecule is active before spawning
 	void ChangeToO2();
+
+	glm::vec3 origPos;
+	glm::vec3 position;
+	float rotation;
+	glm::vec3 scale;
+
+	glm::vec3 random_vector;
 private:
 	/* Data */
 	Model co2Model;
@@ -47,13 +54,8 @@ private:
 	int tick = 0;
 
 	glm::vec3 spawn_point = glm::vec3(0.0f, -0.75f, -1.5f);
-	glm::vec3 position;
-	glm::vec3 rotation;
-	glm::vec3 scale;
 	glm::mat4 model;
 
 	glm::vec3 color;
 
-	/* Functions */
-	glm::mat4 GetModelMatrix();
 };

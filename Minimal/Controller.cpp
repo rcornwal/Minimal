@@ -25,6 +25,10 @@ glm::mat4 Controller::GetModelMatrix() {
 	return modelMat;
 }
 
+glm::vec3 Controller::GetColor() {
+	return laser.color;
+}
+
 void Controller::Render(glm::mat4 view, glm::mat4 proj) {
 
 	controllerShader.Use();
@@ -42,10 +46,10 @@ void Controller::Render(glm::mat4 view, glm::mat4 proj) {
 	// Calculate the toWorld matrix for the model
 	glm::mat4 model;
 	model = glm::translate(model, position);
+
 	glm::quat orientation = glm::quat(rotation.w, rotation.x, rotation.y, rotation.z);
 	glm::mat4 rotationMatrix = glm::toMat4(orientation);
 	model *= rotationMatrix;
-
 	model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 
 	model = glm::scale(model, glm::vec3(0.05f, 0.05f, 0.05f));
@@ -74,5 +78,11 @@ void Controller::Render(glm::mat4 view, glm::mat4 proj) {
 	laser.position = position;
 	laser.rotation = rotation;
 	laser.Render(view, proj);
+
+	// Calculates the ray equation
+	ray.origin = position;
+	ray.dir = glm::normalize(orientation * glm::vec3(0, 0, -1));
+	ray.dist = 75.0f; //magic number - same as laserDist in Laser.h
+
 }
 

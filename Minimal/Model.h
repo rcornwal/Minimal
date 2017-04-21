@@ -24,15 +24,6 @@ using namespace std;
 #include <assimp/postprocess.h>
 //#include <soil.h>
 
-struct BoundingBox {
-	float min_x;
-	float min_y;
-	float min_z;
-	float max_x;
-	float max_y;
-	float max_z;
-};
-
 class Model {
 public:
 	Model() {}
@@ -44,8 +35,6 @@ private:
 	vector<Mesh> meshes;
 	string directory;
 	vector <Texture> textures_loaded;
-
-	BoundingBox bb;
 
 	/* Functions */
 	void LoadModel(string path);

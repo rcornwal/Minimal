@@ -30,6 +30,12 @@
 #include <OVR_CAPI.h>
 #include <OVR_CAPI_GL.h>
 
+struct Ray {
+	glm::vec3 origin;
+	glm::vec3 dir;
+	float dist;
+};
+
 class Controller {
 public:
 	glm::vec3 position;
@@ -43,6 +49,10 @@ public:
 
 	Controller();
 	void Render(glm::mat4 view, glm::mat4 proj);
+
+	glm::vec3 GetColor();
+
+	Ray ray;
 private:
 	/* Data */
 	Laser laser;

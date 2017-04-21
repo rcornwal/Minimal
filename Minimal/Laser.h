@@ -28,6 +28,7 @@
 
 class Laser {
 public:
+	float laserDist = 75.0f;;
 	glm::vec3 position;
 	glm::vec4 rotation;
 	glm::vec3 scale;
@@ -37,12 +38,12 @@ public:
 	void Draw();
 	void SetGreen();
 	void SetRed();
+	glm::vec3 color;
 
 private:
 	/* Data */
 	vector<GLfloat> vertices;
 	vector<GLuint> indices;
-	glm::vec3 color;
 
 	GLchar* vertexShaderPath = "./Models/laser/laser.vs";
 	GLchar* fragShaderPath   = "./Models/laser/laser.frag";
