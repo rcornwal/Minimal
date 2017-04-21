@@ -43,8 +43,10 @@ class GameScene {
 private:
 
 	Factory factoryModel;
+	
 	CO2Molecule moleculeContainer[MAX_MOLECULES];
 	CO2Molecule molecule;
+	
 	Controller leftController;
 	Controller rightController;
 
@@ -68,6 +70,7 @@ public:
 		//factoryModel.Render(modelview, projection);
 		
 		// Set a new molecule to active every second (oculus should have 90 fps)
+
 		if (tick == 1000) {
 			moleculeContainer[lastUsedMolecule].active = true;
 			lastUsedMolecule++;
@@ -82,8 +85,6 @@ public:
 				moleculeContainer[i].Render(modelview, projection);
 			}
 		}
-
-		
 
 		leftController.position = hmdData.leftControllerPos;
 		leftController.rotation = hmdData.leftControllerOrientation;

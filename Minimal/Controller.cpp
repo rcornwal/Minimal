@@ -36,13 +36,12 @@ void Controller::Render(glm::mat4 view, glm::mat4 proj) {
 
 	glUniform3f(objectColorLoc, 1.0f, 1.0f,1.0f);
 	glUniform3f(lightColorLoc, 1.0f, 1.0f, 1.0f);
-	glUniform3f(lightPosLoc, 0.0f,0.0f, 0.0f);
+	glUniform3f(lightPosLoc, 0.0f ,0.0f, 0.0f);
 	glUniform3f(viewPosLoc,0.0, 0.0, 0.0);
 
 	// Calculate the toWorld matrix for the model
 	glm::mat4 model;
 	model = glm::translate(model, position);
-	
 	glm::quat orientation = glm::quat(rotation.w, rotation.x, rotation.y, rotation.z);
 	glm::mat4 rotationMatrix = glm::toMat4(orientation);
 	model *= rotationMatrix;
@@ -55,6 +54,10 @@ void Controller::Render(glm::mat4 view, glm::mat4 proj) {
 	glUniformMatrix4fv(glGetUniformLocation(controllerShader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(proj));
 
 	controllerModel.Draw(controllerShader);
+
+	laser.SetGreen();
+	laser.position = position;
+	laser.rotation = rotation;
 	laser.Render(view, proj);
 }
 

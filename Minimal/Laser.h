@@ -35,11 +35,17 @@ public:
 	Laser();
 	void Render(glm::mat4 view, glm::mat4 proj);
 	void Draw();
+	void SetGreen();
+	void SetRed();
 
 private:
 	/* Data */
+	vector<GLfloat> vertices;
+	vector<GLuint> indices;
+	glm::vec3 color;
+
 	GLchar* vertexShaderPath = "./Models/laser/laser.vs";
 	GLchar* fragShaderPath   = "./Models/laser/laser.frag";
 	Shader laserShader;
-
+	GLuint VAO, VBO, EBO;
 };
