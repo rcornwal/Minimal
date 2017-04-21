@@ -688,11 +688,15 @@ protected:
 
 	void renderScene(const glm::mat4 & projection, const glm::mat4 & headPose) override {
 		
+		ovrInputState inputState;
+		ovr_GetInputState(_session, ovrControllerType_Touch, &inputState);
+
 		// pass in info about the hmd to our scene
 		cubeScene->hmdData.leftControllerPos = leftControllerPos();
 		cubeScene->hmdData.rightControllerPos = rightControllerPos();
 		cubeScene->hmdData.leftControllerOrientation = leftControllerOrientation();
 		cubeScene->hmdData.rightControllerOrientation = rightControllerOrientation();
+		cubeScene->hmdData.inputState = inputState;
 
 		cubeScene->render(projection, glm::inverse(headPose));
 	}

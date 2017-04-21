@@ -27,11 +27,19 @@
 #include <glm/gtx/quaternion.hpp>
 #include <GL/glew.h>
 
+#include <OVR_CAPI.h>
+#include <OVR_CAPI_GL.h>
+
 class Controller {
 public:
 	glm::vec3 position;
 	glm::vec4 rotation;
 	glm::vec3 scale;
+
+	// Controlls for this controller
+	ovrInputState inputState;
+	ovrTouch btn1, btn2;
+	ovrHandType hand;
 
 	Controller();
 	void Render(glm::mat4 view, glm::mat4 proj);
@@ -43,6 +51,7 @@ private:
 	GLchar* vertexShaderPath = "./Models/wand/wand.vs";
 	GLchar* fragShaderPath   = "./Models/wand/wand.frag";
 	Shader controllerShader;
+
 
 	/* Functions */
 	glm::mat4 GetModelMatrix();

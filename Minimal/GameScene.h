@@ -18,7 +18,10 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#define MAX_MOLECULES 10
+#include <OVR_CAPI.h>
+#include <OVR_CAPI_GL.h>
+
+#define MAX_MOLECULES 200
 
 #define FAIL(X) throw std::runtime_error(X)
 
@@ -37,6 +40,7 @@ using glm::quat;
 #include "Controller.h"
 #include "CO2Molecule.h"
 
+
 // a class for encapsulating building and rendering an RGB cube
 class GameScene {
 
@@ -45,7 +49,6 @@ private:
 	Factory factoryModel;
 	
 	CO2Molecule moleculeContainer[MAX_MOLECULES];
-	CO2Molecule molecule;
 	
 	Controller leftController;
 	Controller rightController;
@@ -61,17 +64,18 @@ public:
 		glm::vec3 rightControllerPos;
 		glm::vec4 leftControllerOrientation;
 		glm::vec4 rightControllerOrientation;
+		ovrInputState inputState;
 	} hmdData;
 
 	GameScene() {}
 
 	void render(const mat4 & projection, const mat4 & modelview) {
 
-		//factoryModel.Render(modelview, projection);
+		factoryModel.Render(modelview, projection);
 		
 		// Set a new molecule to active every second (oculus should have 90 fps)
 
-		if (tick == 1000) {
+		if (tick == 500) {
 			moleculeContainer[lastUsedMolecule].active = true;
 			lastUsedMolecule++;
 			lastUsedMolecule %= MAX_MOLECULES;
@@ -82,13 +86,26 @@ public:
 		// Render all the active molecules
 		for (int i = 0; i < MAX_MOLECULES; ++i) {
 			if (moleculeContainer[i].active) {
+				moleculeContainer[i].ChangeToO2();
 				moleculeContainer[i].Render(modelview, projection);
 			}
 		}
 
+		// Controlls for the left controller
+		leftController.inputState = hmdData.inputState;
+		leftController.btn1 = ovrTouch_X;
+		leftController.btn2 = ovrTouch_Y;
+		leftController.hand = ovrHand_Left;
+
 		leftController.position = hmdData.leftControllerPos;
 		leftController.rotation = hmdData.leftControllerOrientation;
 		leftController.Render(modelview, projection);
+
+		// Controlls for the right controller
+		rightController.inputState = hmdData.inputState;
+		rightController.btn1 = ovrTouch_A;
+		rightController.btn2 = ovrTouch_B;
+		rightController.hand = ovrHand_Right;
 
 		rightController.position = hmdData.rightControllerPos;
 		rightController.rotation = hmdData.rightControllerOrientation;

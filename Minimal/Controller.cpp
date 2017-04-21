@@ -55,7 +55,22 @@ void Controller::Render(glm::mat4 view, glm::mat4 proj) {
 
 	controllerModel.Draw(controllerShader);
 
-	laser.SetGreen();
+	// Get the button presses
+	if (inputState.Buttons & btn1) {
+		// on button 1 press
+	}else {
+		
+	}
+
+	// Get the trigger presses
+	if (inputState.IndexTrigger[hand] > .5) {
+		laser.SetRed();
+	}
+	else {
+		laser.SetGreen();
+	}
+
+	// Render the laser
 	laser.position = position;
 	laser.rotation = rotation;
 	laser.Render(view, proj);
