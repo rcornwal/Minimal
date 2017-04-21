@@ -9,25 +9,28 @@
 /////////////////////////////////////////////////////
 
 CO2Molecule::CO2Molecule() {
+	this->setup();
+}
 
+CO2Molecule::CO2Molecule(Model co2M, Model o2M) {
 	// Create the shader to use for the factory
 	Shader facS(vertexShaderPath, fragShaderPath);
 	co2Shader = facS;
 
 
 	// Creates the model for the factory
-	Model co2M(pathToFactory);
 	co2Model = co2M;
-
-	Model o2M(pathToO2);
 	o2Model = o2M;
 
+	this->setup();
+}
+
+void CO2Molecule::setup() {
 	// Sets the position / rotation / scale
 	position = glm::vec3(0, 0, 0);
 	rotation = glm::vec3(0, 0, 0);
 	scale = glm::vec3(1, 1, 1);
 	color = glm::vec3(0.0f, 0.5f, 0.31f);
-
 }
 
 void CO2Molecule::ChangeToO2() {
@@ -53,7 +56,7 @@ void CO2Molecule::Render(glm::mat4 view, glm::mat4 proj) {
 	// Apply the appropriate transformations for animations. 
 	if (init) {
 		model = glm::translate(model, spawn_point);
-		model = glm::scale(model, glm::vec3(0.03f, 0.03f, 0.03f));
+		model = glm::scale(model, glm::vec3(0.05f, 0.05f, 0.05f));
 		init = false;
 	}
 	
@@ -62,26 +65,28 @@ void CO2Molecule::Render(glm::mat4 view, glm::mat4 proj) {
 	if (position.x >= BOUND) {
 		x_move = -x_move;
 	}
-	if (position.y >= BOUND + 15.0f) {
+	if (position.y >= BOUND) {
 		y_move = -y_move;
 	}
-	if (position.z >= BOUND - 1.5) {
+	if (position.z >= BOUND) {
 		z_move = -z_move;
 	}
 	if (position.x <= -BOUND) {
 		x_move = -x_move;
 	}
-	if (position.y <= -BOUND + 15.0f) {
+	if (position.y <= -BOUND) {
 		y_move = -y_move;
 	}
-	if (position.z <= -BOUND - 1.5) {
+	if (position.z <= -BOUND) {
 		z_move = -z_move;
 	}
 
-	model = glm::translate(model, glm::vec3(x_move, y_move, z_move));
+	glm::vec3 move = glm::normalize(glm::vec3(x_move, y_move, z_move)) * 0.03f;
+
+	model = glm::translate(model, move);
 	model = glm::rotate(model, 0.01f, random_vector);
 
-	position = position + glm::vec3(x_move, y_move, z_move);
+	position = position + move;
 	rotation = rotation + random_vector;
 	tick++;
 

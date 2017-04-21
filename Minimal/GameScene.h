@@ -49,6 +49,7 @@ private:
 	Factory factoryModel;
 	
 	CO2Molecule moleculeContainer[MAX_MOLECULES];
+	CO2Molecule startingMolecules[5];
 	
 	Controller leftController;
 	Controller rightController;
@@ -67,7 +68,17 @@ public:
 		ovrInputState inputState;
 	} hmdData;
 
-	GameScene() {}
+	GameScene() {
+		Model co2M("./Models/co2/co2.obj");
+		Model o2M("./Models/o2/o2.obj");
+		for (int i = 0; i < MAX_MOLECULES; i++) {
+			moleculeContainer[i] = CO2Molecule(co2M, o2M);
+		}
+		for (int i = 0; i < 5; i++) {
+			startingMolecules[i] = CO2Molecule(co2M, o2M);
+			startingMolecules[i].active = true;
+		}
+	}
 
 	void render(const mat4 & projection, const mat4 & modelview) {
 
@@ -86,9 +97,12 @@ public:
 		// Render all the active molecules
 		for (int i = 0; i < MAX_MOLECULES; ++i) {
 			if (moleculeContainer[i].active) {
-				moleculeContainer[i].ChangeToO2();
 				moleculeContainer[i].Render(modelview, projection);
 			}
+		}
+
+		for (int i = 0; i < 5; ++i) {
+			startingMolecules[i].Render(modelview, projection);
 		}
 
 		// Controlls for the left controller

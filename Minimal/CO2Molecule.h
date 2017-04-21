@@ -25,7 +25,9 @@
 class CO2Molecule {
 public:
 	CO2Molecule();
+	CO2Molecule(Model co2M, Model o2M);
 	void Render(glm::mat4 view, glm::mat4 proj);
+	void setup();
 	bool active = false; // makes sure the molecule is active before spawning
 	void ChangeToO2();
 private:
@@ -33,15 +35,13 @@ private:
 	Model co2Model;
 	Model o2Model;
 
-	GLchar* pathToO2 = "./Models/o2/o2.obj";
-	GLchar* pathToFactory = "./Models/co2/co2.obj";
 	GLchar* vertexShaderPath = "./Models/co2/co2.vs";
 	GLchar* fragShaderPath = "./Models/co2/co2.frag";
 	Shader co2Shader;
 
-	float y_move = 0.05f;
-	float x_move = 0.05f;
-	float z_move = 0.05f;
+	float y_move = rand() % 100 - 50;
+	float x_move = rand() % 100 - 50;
+	float z_move = rand() % 100 - 50;
 
 	bool init = true;
 	int tick = 0;
