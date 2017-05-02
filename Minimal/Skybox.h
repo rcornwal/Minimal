@@ -47,7 +47,12 @@ private:
 	Shader skyboxShader;
 	GLuint VAO, VBO, EBO;
 
-	GLchar* texturePathNX = "./Models/texcube/pattern.ppm";
+	GLchar* texturePathNX = "./Models/skybox/pattern.ppm";
+	GLchar* texturePathNY = "./Models/skybox/pattern.ppm";
+	GLchar* texturePathNZ = "./Models/skybox/pattern.ppm";
+	GLchar* texturePathPX = "./Models/skybox/pattern.ppm";
+	GLchar* texturePathPY = "./Models/skybox/pattern.ppm";
+	GLchar* texturePathPZ = "./Models/skybox/pattern.ppm";
 
 	GLint cubeTextureNX;
 	GLint cubeTextureNY;

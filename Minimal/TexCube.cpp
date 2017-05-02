@@ -16,7 +16,7 @@ TexCube::TexCube() {
 	// Sets the position / rotation / scale
 	position = glm::vec3(0.0f, -1.0f, -1.0f);
 	rotation = glm::vec4(0, 0, 0, 0);
-	scale = glm::vec3(1, 1, 1);
+	scale = glm::vec3(.5f, .5f, .5f);
 
 	// Set up the arrays
 	GLfloat vertices[] = {
@@ -115,8 +115,8 @@ void TexCube::Render(glm::mat4 view, glm::mat4 proj) {
 	// Calculate the toWorld matrix for the model
 	glm::mat4 model;
 	model = glm::translate(model, position);
-	model = glm::rotate(model, glm::radians(95.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-	model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
+	//model = glm::rotate(model, glm::radians(95.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	model = glm::scale(model, glm::vec3(scale.x, scale.y, scale.z));
 
 	// Set the model view projection matrix in our shader
 	glUniformMatrix4fv(glGetUniformLocation(texCubeShader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
@@ -124,6 +124,19 @@ void TexCube::Render(glm::mat4 view, glm::mat4 proj) {
 	glUniformMatrix4fv(glGetUniformLocation(texCubeShader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(proj));
 	
 	Draw();
+}
+
+void TexCube::ScaleUp() {
+	float scaleStep = .01f;
+	scale = glm::vec3(scale.x + scaleStep, scale.y + scaleStep, scale.z + scaleStep);
+	//scale = glm::vec3(1.0f, 1.0f, 1.0f);
+}
+
+void TexCube::ScaleDown() {
+	float scaleStep = .01f;
+	//scale = glm::vec3(1.0f, 1.0f, 1.0f);
+
+	scale = glm::vec3(scale.x - scaleStep, scale.y - scaleStep, scale.z - scaleStep);
 }
 
 unsigned char* TexCube::loadPPM(const char* filename, int& width, int& height)

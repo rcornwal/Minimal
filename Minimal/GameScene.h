@@ -104,5 +104,13 @@ public:
 			resetGame();
 		}
 
+		// Get the left stick
+		if (hmdData.inputState.Thumbstick[ovrHand_Left].x > 0) {
+			texCube.ScaleDown();
+		}
+		else if (hmdData.inputState.Thumbstick[ovrHand_Left].x < 0) {
+			texCube.ScaleUp();
+		}
+
 	}
 };

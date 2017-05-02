@@ -66,7 +66,7 @@ public:
 
 	void render(const mat4 & projection, const mat4 & modelview) {
 
-		skybox.Render(modelview, projection);
+		//skybox.Render(modelview, projection);
 
 	}
 };

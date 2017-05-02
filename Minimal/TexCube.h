@@ -37,6 +37,9 @@ public:
 	void Draw();
 	glm::vec3 color;
 
+	void ScaleUp();
+	void ScaleDown();
+
 private:
 	/* Data */
 	vector<GLfloat> vertices;
