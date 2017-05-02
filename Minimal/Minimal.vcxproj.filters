@@ -33,13 +33,10 @@
     <ClCompile Include="Controller.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CO2Molecule.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Laser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="O2Molecule.cpp">
+    <ClCompile Include="TexCube.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -65,13 +62,10 @@
     <ClInclude Include="Controller.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CO2Molecule.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Laser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="O2Molecule.h">
+    <ClInclude Include="TexCube.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

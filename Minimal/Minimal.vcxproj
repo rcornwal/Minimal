@@ -131,7 +131,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="CO2Molecule.cpp" />
     <ClCompile Include="Controller.cpp" />
     <ClCompile Include="Factory.cpp" />
     <ClCompile Include="GameScene.cpp" />
@@ -139,21 +138,20 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Model.cpp" />
-    <ClCompile Include="O2Molecule.cpp" />
+    <ClCompile Include="TexCube.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CO2Molecule.h" />
     <ClInclude Include="Controller.h" />
     <ClInclude Include="Factory.h" />
     <ClInclude Include="GameScene.h" />
     <ClInclude Include="Laser.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Model.h" />
-    <ClInclude Include="O2Molecule.h" />
     <ClInclude Include="Shader.h" />
+    <ClInclude Include="TexCube.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
