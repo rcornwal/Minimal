@@ -26,6 +26,7 @@ limitations under the License.
 #include <Windows.h>
 
 #include "GameScene.h"
+#include "StereoScene.h"
 
 #define __STDC_FORMAT_MACROS 1
 
@@ -329,6 +330,16 @@ namespace ovr {
 		}
 	}
 
+	template <typename Function>
+	inline void for_left_eye(Function function) {
+		function(ovrEyeType::ovrEye_Left);
+	}
+
+	template <typename Function>
+	inline void for_right_eye(Function function) {
+		function(ovrEyeType::ovrEye_Right);
+	}
+
 	inline mat4 toGlm(const ovrMatrix4f & om) {
 		return glm::transpose(glm::make_mat4(&om.M[0][0]));
 	}
@@ -602,6 +613,12 @@ protected:
 			_sceneLayer.RenderPose[eye] = eyePoses[eye];
 			renderScene(_eyeProjections[eye], ovr::toGlm(eyePoses[eye]));
 		});
+		ovr::for_left_eye([&](ovrEyeType eye) {
+			const auto& vp = _sceneLayer.Viewport[eye];
+			glViewport(vp.Pos.x, vp.Pos.y, vp.Size.w, vp.Size.h);
+			_sceneLayer.RenderPose[eye] = eyePoses[eye];
+			renderSky(_eyeProjections[eye], ovr::toGlm(eyePoses[eye]));
+		});
 		glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0);
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 		ovr_CommitTextureSwapChain(_session, _eyeTexture);
@@ -617,6 +634,7 @@ protected:
 	}
 
 	virtual void renderScene(const glm::mat4 & projection, const glm::mat4 & headPose) = 0;
+	virtual void renderSky(const glm::mat4 & projection, const glm::mat4 & headPose) = 0;
 };
 
 //////////////////////////////////////////////////////////////////////
@@ -630,6 +648,7 @@ protected:
 
 class ExampleApp : public RiftApp {
 	std::shared_ptr<GameScene> cubeScene;
+	std::shared_ptr<StereoScene> stereoScene;
 
 public:
 	ExampleApp() { }
@@ -680,6 +699,7 @@ protected:
 		glEnable(GL_DEPTH_TEST);
 		ovr_RecenterTrackingOrigin(_session);
 		cubeScene = std::shared_ptr<GameScene>(new GameScene());
+		stereoScene = std::shared_ptr<StereoScene>(new StereoScene());
 	}
 
 	void shutdownGl() override {
@@ -699,6 +719,11 @@ protected:
 		cubeScene->hmdData.inputState = inputState;
 
 		cubeScene->render(projection, glm::inverse(headPose));
+	}
+
+	void renderSky(const glm::mat4 & projection, const glm::mat4 & headPose) {
+
+		stereoScene->render(projection, glm::inverse(headPose));
 	}
 };
 

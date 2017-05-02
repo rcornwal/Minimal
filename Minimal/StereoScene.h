@@ -1,3 +1,4 @@
+#pragma once
 /////////////////////
 // GameScene.h
 /////////////////////
@@ -21,8 +22,6 @@
 #include <OVR_CAPI.h>
 #include <OVR_CAPI_GL.h>
 
-#define MAX_MOLECULES 200
-
 #define FAIL(X) throw std::runtime_error(X)
 
 // Import the most commonly used types into the default namespace
@@ -36,23 +35,17 @@ using glm::vec3;
 using glm::vec4;
 using glm::quat;
 
-#include "TexCube.h"
 #include "Skybox.h"
-#include "Controller.h"
 
 using namespace glm;
 
 
 // a class for encapsulating building and rendering an RGB cube
-class GameScene {
+class StereoScene {
 
 private:
 
-	TexCube texCube;
-
-	Controller leftController;
-	Controller rightController;
-
+	Skybox skybox;
 
 	int gameState = 0;
 
@@ -67,42 +60,13 @@ public:
 		ovrInputState inputState;
 	} hmdData;
 
-	GameScene() {
-
-	}
-
-	void resetGame() {
+	StereoScene() {
 
 	}
 
 	void render(const mat4 & projection, const mat4 & modelview) {
 
-		texCube.Render(modelview, projection);
-
-		// Controlls for the left controller
-		leftController.inputState = hmdData.inputState;
-		leftController.btn1 = ovrTouch_X;
-		leftController.btn2 = ovrTouch_Y;
-		leftController.hand = ovrHand_Left;
-
-		leftController.position = hmdData.leftControllerPos;
-		leftController.rotation = hmdData.leftControllerOrientation;
-		leftController.Render(modelview, projection);
-
-		// Controlls for the right controller
-		rightController.inputState = hmdData.inputState;
-		rightController.btn1 = ovrTouch_A;
-		rightController.btn2 = ovrTouch_B;
-		rightController.hand = ovrHand_Right;
-
-		rightController.position = hmdData.rightControllerPos;
-		rightController.rotation = hmdData.rightControllerOrientation;
-		rightController.Render(modelview, projection);
-
-		// Reset the game
-		if (gameState != 0 && hmdData.inputState.Buttons & ovrTouch_A) {
-			resetGame();
-		}
+		skybox.Render(modelview, projection);
 
 	}
 };
