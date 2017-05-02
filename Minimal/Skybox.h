@@ -32,7 +32,7 @@ public:
 	glm::vec4 rotation;
 	glm::vec3 scale;
 
-	Skybox(bool left, GLfloat dist);
+	Skybox();
 	void Render(glm::mat4 view, glm::mat4 proj);
 	void Draw();
 	glm::vec3 color;
@@ -47,10 +47,21 @@ private:
 	Shader skyboxShader;
 	GLuint VAO, VBO, EBO;
 
-	GLint skyTexture;
+	GLchar* texturePathNX = "./Models/skybox/pattern.ppm";
+	GLchar* texturePathNY = "./Models/skybox/pattern.ppm";
+	GLchar* texturePathNZ = "./Models/skybox/pattern.ppm";
+	GLchar* texturePathPX = "./Models/skybox/pattern.ppm";
+	GLchar* texturePathPY = "./Models/skybox/pattern.ppm";
+	GLchar* texturePathPZ = "./Models/skybox/pattern.ppm";
+
+	GLint cubeTextureNX;
+	GLint cubeTextureNY;
+	GLint cubeTextureNZ;
+	GLint cubeTexturePX;
+	GLint cubeTexturePY;
+	GLint cubeTexturePZ;
 
 	/* Functions */
 	unsigned char* loadPPM(const char* filename, int& width, int& height);
 	GLint TextureFromFile(const char* filename);
-	GLuint loadCubemap(vector<const GLchar*> faces);
 };

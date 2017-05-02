@@ -1,11 +1,17 @@
+
 #version 330 core
-in vec3 TexCoords;
+
+in vec2 TexCoord;
+in vec3 Normal;  
+
 out vec4 color;
 
-uniform samplerCube skybox;
+uniform sampler2D ourTexture;
+uniform vec3 objectColor;
 
 void main()
-{    
-    color = texture(skybox, TexCoords);
+{
+    color = texture(ourTexture, TexCoord);
+	//color = vec4 (objectColor, 1.0f);
 }
-  
+
