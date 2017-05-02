@@ -617,7 +617,13 @@ protected:
 			const auto& vp = _sceneLayer.Viewport[eye];
 			glViewport(vp.Pos.x, vp.Pos.y, vp.Size.w, vp.Size.h);
 			_sceneLayer.RenderPose[eye] = eyePoses[eye];
-			renderSky(_eyeProjections[eye], ovr::toGlm(eyePoses[eye]));
+			renderSkyLeft(_eyeProjections[eye], ovr::toGlm(eyePoses[eye]));
+		});
+		ovr::for_right_eye([&](ovrEyeType eye) {
+			const auto& vp = _sceneLayer.Viewport[eye];
+			glViewport(vp.Pos.x, vp.Pos.y, vp.Size.w, vp.Size.h);
+			_sceneLayer.RenderPose[eye] = eyePoses[eye];
+			renderSkyRight(_eyeProjections[eye], ovr::toGlm(eyePoses[eye]));
 		});
 		glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0);
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
@@ -634,7 +640,8 @@ protected:
 	}
 
 	virtual void renderScene(const glm::mat4 & projection, const glm::mat4 & headPose) = 0;
-	virtual void renderSky(const glm::mat4 & projection, const glm::mat4 & headPose) = 0;
+	virtual void renderSkyLeft(const glm::mat4 & projection, const glm::mat4 & headPose) = 0;
+	virtual void renderSkyRight(const glm::mat4 & projection, const glm::mat4 & headPose) = 0;
 };
 
 //////////////////////////////////////////////////////////////////////
@@ -721,9 +728,12 @@ protected:
 		cubeScene->render(projection, glm::inverse(headPose));
 	}
 
-	void renderSky(const glm::mat4 & projection, const glm::mat4 & headPose) {
+	void renderSkyLeft(const glm::mat4 & projection, const glm::mat4 & headPose) {
+		stereoScene->renderLeft(projection, glm::inverse(headPose));
+	}
 
-		stereoScene->render(projection, glm::inverse(headPose));
+	void renderSkyRight(const glm::mat4 & projection, const glm::mat4 & headPose) {
+		stereoScene->renderRight(projection, glm::inverse(headPose));
 	}
 };
 
