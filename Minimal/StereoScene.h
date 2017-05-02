@@ -23,6 +23,7 @@
 #include <OVR_CAPI_GL.h>
 
 #define FAIL(X) throw std::runtime_error(X)
+#define EYE_DISTANCE 0.30f
 
 // Import the most commonly used types into the default namespace
 using glm::ivec3;
@@ -45,7 +46,8 @@ class StereoScene {
 
 private:
 
-	Skybox skybox;
+	Skybox skyboxLeft = Skybox(true, EYE_DISTANCE);
+	Skybox skyboxRight = Skybox(false, EYE_DISTANCE);
 
 	int gameState = 0;
 
@@ -64,9 +66,15 @@ public:
 
 	}
 
-	void render(const mat4 & projection, const mat4 & modelview) {
+	void renderLeft(const mat4 & projection, const mat4 & modelview) {
 
-		//skybox.Render(modelview, projection);
+		skyboxLeft.Render(modelview, projection);
+
+	}
+
+	void renderRight(const mat4 & projection, const mat4 & modelview) {
+
+		skyboxRight.Render(modelview, projection);
 
 	}
 };

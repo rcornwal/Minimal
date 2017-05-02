@@ -7,14 +7,15 @@
 
 /////////////////////////////////////////////////////
 
-Skybox::Skybox() {
+Skybox::Skybox(bool left, GLfloat dist) {
 
 	// Create the shader to use for the controller
 	Shader cubeS(vertexShaderPath, fragShaderPath);
 	skyboxShader = cubeS;
+	if (left) dist = -dist;
 
 	// Sets the position / rotation / scale
-	position = glm::vec3(0.0f, 0.0f, 0.0f);
+	position = glm::vec3(dist, 0.0f, 0.0f);
 	rotation = glm::vec4(0, 0, 0, 0);
 	scale = glm::vec3(20, 20, 20);
 
@@ -90,12 +91,48 @@ Skybox::Skybox() {
 	glEnableVertexAttribArray(2);
 	glBindVertexArray(0);
 
-	cubeTextureNX = TextureFromFile(texturePathNX);
+	GLchar* texturePathNX;
+	GLchar* texturePathNY;
+	GLchar* texturePathNZ;
+	GLchar* texturePathPX;
+	GLchar* texturePathPY;
+	GLchar* texturePathPZ;
+
+	if (left) {
+		texturePathNX = "./Models/skybox/left-ppm/nx.ppm";
+		texturePathNY = "./Models/skybox/left-ppm/ny.ppm";
+		texturePathNZ = "./Models/skybox/left-ppm/nz.ppm";
+		texturePathPX = "./Models/skybox/left-ppm/px.ppm";
+		texturePathPY = "./Models/skybox/left-ppm/py.ppm";
+		texturePathPZ = "./Models/skybox/left-ppm/pz.ppm";
+	}
+	else {
+		texturePathNX = "./Models/skybox/right-ppm/nx.ppm";
+		texturePathNY = "./Models/skybox/right-ppm/ny.ppm";
+		texturePathNZ = "./Models/skybox/right-ppm/nz.ppm";
+		texturePathPX = "./Models/skybox/right-ppm/px.ppm";
+		texturePathPY = "./Models/skybox/right-ppm/py.ppm";
+		texturePathPZ = "./Models/skybox/right-ppm/pz.ppm";
+	}
+
+	vector<const GLchar*> faces;
+	faces.push_back(texturePathPX);
+	faces.push_back(texturePathNX);
+	faces.push_back(texturePathPY);
+	faces.push_back(texturePathNY);
+	faces.push_back(texturePathPZ);
+	faces.push_back(texturePathNZ);
+
+	skyTexture = loadCubemap(faces);
+	// skyTexture = TextureFromFile(texturePathNY);
 }
 
 void Skybox::Draw() {
 	// Draw the box
 	glBindVertexArray(this->VAO);
+	glActiveTexture(GL_TEXTURE0);
+	glUniform1i(glGetUniformLocation(skyboxShader.Program, "ourTexture"), 0);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, skyTexture);
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 	glBindVertexArray(0);
 }
@@ -106,11 +143,8 @@ void Skybox::Render(glm::mat4 view, glm::mat4 proj) {
 
 	// Bind Textures using texture units
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, cubeTextureNX);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, skyTexture);
 	glUniform1i(glGetUniformLocation(skyboxShader.Program, "ourTexture"), 0);
-
-	GLint objectColorLoc = glGetUniformLocation(skyboxShader.Program, "objectColor");
-	glUniform3f(objectColorLoc, 1.0f, 0.0f, 0.0f);
 
 	// Calculate the toWorld matrix for the model
 	glm::mat4 model;
@@ -124,6 +158,36 @@ void Skybox::Render(glm::mat4 view, glm::mat4 proj) {
 	glUniformMatrix4fv(glGetUniformLocation(skyboxShader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(proj));
 
 	Draw();
+}
+
+GLuint Skybox::loadCubemap(vector<const GLchar*> faces)
+{
+	GLuint textureID;
+	glGenTextures(1, &textureID);
+	glActiveTexture(GL_TEXTURE0);
+
+	int width, height;
+	unsigned char* image;
+
+	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+	for (GLuint i = 0; i < faces.size(); i++)
+	{
+		image = loadPPM(faces[i], width, height);
+		glTexImage2D(
+			GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0,
+			GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image
+		);
+	}
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+
+	return textureID;
+
 }
 
 unsigned char* Skybox::loadPPM(const char* filename, int& width, int& height)
