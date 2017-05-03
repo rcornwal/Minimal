@@ -670,7 +670,7 @@ protected:
 		}
 
 		// Right might be left, left might be right, my bad lol
-		ovrVector3f offsets[2] = { right_offset, left_offset };
+		ovrVector3f offsets[2] = { left_offset, right_offset };
 		ovr_GetEyePoses(_session, frame, true, offsets, eyePoses, &_sceneLayer.SensorSampleTime);
 		
 		int curIndex;
