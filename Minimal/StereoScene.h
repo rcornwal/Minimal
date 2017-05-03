@@ -23,7 +23,7 @@
 #include <OVR_CAPI_GL.h>
 
 #define FAIL(X) throw std::runtime_error(X)
-#define EYE_DISTANCE 0.30f
+#define EYE_DISTANCE 0.0f
 
 // Import the most commonly used types into the default namespace
 using glm::ivec3;

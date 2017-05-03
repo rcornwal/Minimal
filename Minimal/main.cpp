@@ -453,6 +453,9 @@ private:
 
 	ovrEyeRenderDesc EyeRenderDesc[2];
 
+	GLuint _view_state = 0;
+	GLboolean a_button_down = false;
+
 public:
 
 	
@@ -607,24 +610,11 @@ protected:
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbo);
 		glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, curTexId, 0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		ovr::for_each_eye([&](ovrEyeType eye) {
-			const auto& vp = _sceneLayer.Viewport[eye];
-			glViewport(vp.Pos.x, vp.Pos.y, vp.Size.w, vp.Size.h);
-			_sceneLayer.RenderPose[eye] = eyePoses[eye];
-			renderScene(_eyeProjections[eye], ovr::toGlm(eyePoses[eye]));
-		});
-		ovr::for_left_eye([&](ovrEyeType eye) {
-			const auto& vp = _sceneLayer.Viewport[eye];
-			glViewport(vp.Pos.x, vp.Pos.y, vp.Size.w, vp.Size.h);
-			_sceneLayer.RenderPose[eye] = eyePoses[eye];
-			renderSkyLeft(_eyeProjections[eye], ovr::toGlm(eyePoses[eye]));
-		});
-		ovr::for_right_eye([&](ovrEyeType eye) {
-			const auto& vp = _sceneLayer.Viewport[eye];
-			glViewport(vp.Pos.x, vp.Pos.y, vp.Size.w, vp.Size.h);
-			_sceneLayer.RenderPose[eye] = eyePoses[eye];
-			renderSkyRight(_eyeProjections[eye], ovr::toGlm(eyePoses[eye]));
-		});
+		glClearColor(0, 0, 0, 0);
+
+		// Render to each eye accordingly
+		renderToEyes(eyePoses);
+
 		glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0);
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 		ovr_CommitTextureSwapChain(_session, _eyeTexture);
@@ -637,6 +627,88 @@ protected:
 		glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, mirrorTextureId, 0);
 		glBlitFramebuffer(0, 0, _mirrorSize.x, _mirrorSize.y, 0, _mirrorSize.y, _mirrorSize.x, 0, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+	}
+
+	void renderToEyes(ovrPosef * eyePoses) {
+		// Input state controls what renders to each eye
+		ovrInputState inputState;
+		ovr_GetInputState(_session, ovrControllerType_Touch, &inputState);
+
+		if (inputState.Buttons && ovrButton_A && !a_button_down) {
+			_view_state = (_view_state + 1) % 4;
+			a_button_down = true;
+		}
+		else if (!inputState.Buttons && a_button_down) {
+			a_button_down = false;
+		}
+
+		// 3D stereo rendering
+		if (_view_state == 0) {
+			ovr::for_right_eye([&](ovrEyeType eye) {
+				const auto& vp = _sceneLayer.Viewport[eye];
+				glViewport(vp.Pos.x, vp.Pos.y, vp.Size.w, vp.Size.h);
+				_sceneLayer.RenderPose[eye] = eyePoses[eye];
+				renderSkyRight(_eyeProjections[eye], ovr::toGlm(eyePoses[eye]));
+				renderScene(_eyeProjections[eye], ovr::toGlm(eyePoses[eye]));
+			});
+			ovr::for_left_eye([&](ovrEyeType eye) {
+				const auto& vp = _sceneLayer.Viewport[eye];
+				glViewport(vp.Pos.x, vp.Pos.y, vp.Size.w, vp.Size.h);
+				_sceneLayer.RenderPose[eye] = eyePoses[eye];
+				renderSkyLeft(_eyeProjections[eye], ovr::toGlm(eyePoses[eye]));
+				renderScene(_eyeProjections[eye], ovr::toGlm(eyePoses[eye]));
+			});
+		}
+
+		// Mono rendering
+		else if (_view_state == 1) {
+			ovr::for_right_eye([&](ovrEyeType eye) {
+				const auto& vp = _sceneLayer.Viewport[eye];
+				glViewport(vp.Pos.x, vp.Pos.y, vp.Size.w, vp.Size.h);
+				_sceneLayer.RenderPose[eye] = eyePoses[eye];
+				renderSkyLeft(_eyeProjections[eye], ovr::toGlm(eyePoses[eye]));
+				renderScene(_eyeProjections[eye], ovr::toGlm(eyePoses[eye]));
+			});
+			ovr::for_left_eye([&](ovrEyeType eye) {
+				const auto& vp = _sceneLayer.Viewport[eye];
+				glViewport(vp.Pos.x, vp.Pos.y, vp.Size.w, vp.Size.h);
+				_sceneLayer.RenderPose[eye] = eyePoses[eye];
+				renderSkyLeft(_eyeProjections[eye], ovr::toGlm(eyePoses[eye]));
+				renderScene(_eyeProjections[eye], ovr::toGlm(eyePoses[eye]));
+			});
+		}
+
+		// Left eye bear, right eye dark rendering
+		else if (_view_state == 2) {
+			ovr::for_right_eye([&](ovrEyeType eye) {
+				const auto& vp = _sceneLayer.Viewport[eye];
+				glViewport(vp.Pos.x, vp.Pos.y, vp.Size.w, vp.Size.h);
+				_sceneLayer.RenderPose[eye] = eyePoses[eye];
+			});
+			ovr::for_left_eye([&](ovrEyeType eye) {
+				const auto& vp = _sceneLayer.Viewport[eye];
+				glViewport(vp.Pos.x, vp.Pos.y, vp.Size.w, vp.Size.h);
+				_sceneLayer.RenderPose[eye] = eyePoses[eye];
+				renderSkyLeft(_eyeProjections[eye], ovr::toGlm(eyePoses[eye]));
+				renderScene(_eyeProjections[eye], ovr::toGlm(eyePoses[eye]));
+			});
+		}
+
+		// Right eye bear, left eye dark rendering
+		else if (_view_state == 3) {
+			ovr::for_right_eye([&](ovrEyeType eye) {
+				const auto& vp = _sceneLayer.Viewport[eye];
+				glViewport(vp.Pos.x, vp.Pos.y, vp.Size.w, vp.Size.h);
+				_sceneLayer.RenderPose[eye] = eyePoses[eye];
+				renderSkyRight(_eyeProjections[eye], ovr::toGlm(eyePoses[eye]));
+				renderScene(_eyeProjections[eye], ovr::toGlm(eyePoses[eye]));
+			});
+			ovr::for_left_eye([&](ovrEyeType eye) {
+				const auto& vp = _sceneLayer.Viewport[eye];
+				glViewport(vp.Pos.x, vp.Pos.y, vp.Size.w, vp.Size.h);
+				_sceneLayer.RenderPose[eye] = eyePoses[eye];
+			});
+		}
 	}
 
 	virtual void renderScene(const glm::mat4 & projection, const glm::mat4 & headPose) = 0;
