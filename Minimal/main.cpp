@@ -631,26 +631,47 @@ protected:
 
 		// Modifies IOD distance
 		ovrPosef eyePoses[2];
-		ovr_GetEyePoses(_session, frame, true, _viewScaleDesc.HmdToEyeOffset, eyePoses, &_sceneLayer.SensorSampleTime);
-		if (inputState.Thumbstick[ovrHand_Right].x > 0) {
+
+		ovrVector3f left_offset = _viewScaleDesc.HmdToEyeOffset[0];
+		ovrVector3f right_offset = _viewScaleDesc.HmdToEyeOffset[1];
+
+		if (inputState.Thumbstick[ovrHand_Right].x > 0 && IOD + right_offset.x <= 1) {
 			IOD += 0.01f * inputState.Thumbstick[ovrHand_Right].x;
 		}
-		else if (inputState.Thumbstick[ovrHand_Right].x < 0) {
+		else if (inputState.Thumbstick[ovrHand_Right].x < 0 && IOD - left_offset.x >= 0) {
 			IOD += 0.01f * inputState.Thumbstick[ovrHand_Right].x;
 		}
-		eyePoses[0].Position.x -= IOD;
-		eyePoses[1].Position.x += IOD;
+
+		left_offset.x -= IOD;
+		right_offset.x += IOD;
 
 		// Resets IOD on right thumb press
 		if (inputState.Buttons & ovrButton_RThumb && !r_thumb_down) {
-			eyePoses[0].Position.x += IOD;
-			eyePoses[1].Position.x -= IOD;
+			left_offset.x -= IOD;
+			right_offset.x += IOD;
 			IOD = 0;
 			r_thumb_down = true;
 		}
 		else if (!inputState.Buttons && r_thumb_down) {
 			r_thumb_down = false;
 		}
+
+		if (left_offset.x > 0) {
+			left_offset.x = 0;
+		}
+		if (right_offset.x < 0) {
+			right_offset.x = 0;
+		}
+		if (left_offset.x < -1) {
+			left_offset.x = -1;
+		}
+		if (right_offset.x > 1) {
+			right_offset.x = 1;
+		}
+
+		// Right might be left, left might be right, my bad lol
+		ovrVector3f offsets[2] = { right_offset, left_offset };
+		ovr_GetEyePoses(_session, frame, true, offsets, eyePoses, &_sceneLayer.SensorSampleTime);
 		
 		int curIndex;
 		ovr_GetTextureSwapChainCurrentIndex(_session, _eyeTexture, &curIndex);

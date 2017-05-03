@@ -129,12 +129,13 @@ void TexCube::Render(glm::mat4 view, glm::mat4 proj) {
 
 void TexCube::ScaleUp() {
 	float scaleStep = .01f;
+	if (scale.x + scaleStep > 1) scaleStep = 0;
 	scale = glm::vec3(scale.x + scaleStep, scale.y + scaleStep, scale.z + scaleStep);
-	//scale = glm::vec3(1.0f, 1.0f, 1.0f);
 }
 
 void TexCube::ScaleDown() {
 	float scaleStep = .01f;
+	if (scale.x - scaleStep < 0) scaleStep = 0;
 	scale = glm::vec3(scale.x - scaleStep, scale.y - scaleStep, scale.z - scaleStep);
 }
 
