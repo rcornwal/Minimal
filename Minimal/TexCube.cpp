@@ -17,6 +17,7 @@ TexCube::TexCube() {
 	position = glm::vec3(0.0f, -1.0f, -1.0f);
 	rotation = glm::vec4(0, 0, 0, 0);
 	scale = glm::vec3(.5f, .5f, .5f);
+	origScale = glm::vec3(.5f, .5f, .5f);
 
 	// Set up the arrays
 	GLfloat vertices[] = {
@@ -63,12 +64,12 @@ TexCube::TexCube() {
 		-0.5f, -0.5f, -0.5f,	0.0f, -1.0f,  0.0f,		0.0f, 0.0f,			// left back
 
 		// top face
-		-0.5f,  0.5f, -0.5f,	0.0f,  1.0f,  0.0f,		0.0f, 0.0f,			// left back
-		0.5f,  0.5f, -0.5f,		0.0f,  1.0f,  0.0f,		1.0f, 0.0f,			// right back
-		0.5f,  0.5f,  0.5f,		0.0f,  1.0f,  0.0f,		1.0f, 1.0f,			// right front
-		0.5f,  0.5f,  0.5f,		0.0f,  1.0f,  0.0f,		1.0f, 1.0f,			// right front
-		-0.5f,  0.5f,  0.5f,	0.0f,  1.0f,  0.0f,		0.0f, 1.0f,			// left front
-		-0.5f,  0.5f, -0.5f,	0.0f,  1.0f,  0.0f,		0.0f, 0.0f			// left back
+		-0.5f,  0.5f, -0.5f,	0.0f,  1.0f,  0.0f,		0.0f, 1.0f,			// left back
+		0.5f,  0.5f, -0.5f,		0.0f,  1.0f,  0.0f,		1.0f, 1.0f,			// right back
+		0.5f,  0.5f,  0.5f,		0.0f,  1.0f,  0.0f,		1.0f, 0.0f,			// right front
+		0.5f,  0.5f,  0.5f,		0.0f,  1.0f,  0.0f,		1.0f, 0.0f,			// right front
+		-0.5f,  0.5f,  0.5f,	0.0f,  1.0f,  0.0f,		0.0f, 0.0f,			// left front
+		-0.5f,  0.5f, -0.5f,	0.0f,  1.0f,  0.0f,		0.0f, 1.0f			// left back
 	};
 	
 	glGenVertexArrays(1, &VAO);
@@ -134,9 +135,11 @@ void TexCube::ScaleUp() {
 
 void TexCube::ScaleDown() {
 	float scaleStep = .01f;
-	//scale = glm::vec3(1.0f, 1.0f, 1.0f);
-
 	scale = glm::vec3(scale.x - scaleStep, scale.y - scaleStep, scale.z - scaleStep);
+}
+
+void TexCube::ResetScale() {
+	scale = origScale;
 }
 
 unsigned char* TexCube::loadPPM(const char* filename, int& width, int& height)

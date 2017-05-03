@@ -55,6 +55,7 @@ private:
 
 
 	int gameState = 0;
+	GLboolean l_thumb_down = false;
 
 public:
 
@@ -110,6 +111,15 @@ public:
 		}
 		else if (hmdData.inputState.Thumbstick[ovrHand_Left].x < 0) {
 			texCube.ScaleUp();
+		}
+
+		// Resets scale on left thumb press
+		if (hmdData.inputState.Buttons & ovrButton_LThumb && !l_thumb_down) {
+			texCube.ResetScale();
+			l_thumb_down = true;
+		}
+		else if (!hmdData.inputState.Buttons && l_thumb_down) {
+			l_thumb_down = false;
 		}
 
 	}

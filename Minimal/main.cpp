@@ -370,6 +370,23 @@ namespace ovr {
 		return translation * orientation;
 	}
 
+	inline mat4 toGlm(const ovrPosef & op, GLuint eye, GLuint _tracking_state, glm::mat4 &origOrientation, glm::vec3 origEyePoses[2]) {
+
+		mat4 orientation = origOrientation;
+		if (_tracking_state == 1 || _tracking_state == 0) {
+			orientation = glm::mat4_cast(toGlm(op.Orientation));
+			origOrientation = orientation;
+		}
+
+		mat4 translation = glm::translate(mat4(), origEyePoses[eye]);
+		if (_tracking_state == 2 || _tracking_state == 0) {
+			translation = glm::translate(mat4(), ovr::toGlm(op.Position));
+			origEyePoses[eye] = ovr::toGlm(op.Position);
+		}
+
+		return translation * orientation;
+	}
+
 	inline ovrMatrix4f fromGlm(const mat4 & m) {
 		ovrMatrix4f result;
 		mat4 transposed(glm::transpose(m));
@@ -454,8 +471,16 @@ private:
 	ovrEyeRenderDesc EyeRenderDesc[2];
 	float IOD = 0.0f;
 
+	glm::mat4 origOrientation = glm::mat4(1.0);
+	glm::vec3 origEyePoses[2];
+
+	GLuint _scene_state = 0;
 	GLuint _view_state = 0;
+	GLuint _tracking_state = 0;
 	GLboolean a_button_down = false;
+	GLboolean r_thumb_down = false;
+	GLboolean x_button_down = false;
+	GLboolean b_button_down = false;
 
 public:
 
@@ -604,7 +629,7 @@ protected:
 		ovrInputState inputState;
 		ovr_GetInputState(_session, ovrControllerType_Touch, &inputState);
 
-		// Modifies IPD distance
+		// Modifies IOD distance
 		ovrPosef eyePoses[2];
 		ovr_GetEyePoses(_session, frame, true, _viewScaleDesc.HmdToEyeOffset, eyePoses, &_sceneLayer.SensorSampleTime);
 		if (inputState.Thumbstick[ovrHand_Right].x > 0) {
@@ -615,6 +640,17 @@ protected:
 		}
 		eyePoses[0].Position.x -= IOD;
 		eyePoses[1].Position.x += IOD;
+
+		// Resets IOD on right thumb press
+		if (inputState.Buttons & ovrButton_RThumb && !r_thumb_down) {
+			eyePoses[0].Position.x += IOD;
+			eyePoses[1].Position.x -= IOD;
+			IOD = 0;
+			r_thumb_down = true;
+		}
+		else if (!inputState.Buttons && r_thumb_down) {
+			r_thumb_down = false;
+		}
 		
 		int curIndex;
 		ovr_GetTextureSwapChainCurrentIndex(_session, _eyeTexture, &curIndex);
@@ -647,7 +683,8 @@ protected:
 		ovrInputState inputState;
 		ovr_GetInputState(_session, ovrControllerType_Touch, &inputState);
 
-		if (inputState.Buttons && ovrButton_A && !a_button_down) {
+		// view toggling
+		if (inputState.Buttons & ovrTouch_A && !a_button_down) {
 			_view_state = (_view_state + 1) % 4;
 			a_button_down = true;
 		}
@@ -655,21 +692,41 @@ protected:
 			a_button_down = false;
 		}
 
+		// scene toggling
+		if (inputState.Buttons & ovrTouch_X && !x_button_down) {
+			_scene_state = (_scene_state + 1) % 3;
+			x_button_down = true;
+		}
+		else if (!inputState.Buttons && x_button_down) {
+			x_button_down = false;
+		}
+
+		// tracking toggling
+		if (inputState.Buttons & ovrTouch_B && !b_button_down) {
+			_tracking_state = (_tracking_state + 1) % 4;
+			b_button_down = true;
+		}
+		else if (!inputState.Buttons && b_button_down) {
+			b_button_down = false;
+		}
+		
+
 		// 3D stereo rendering
 		if (_view_state == 0) {
 			ovr::for_right_eye([&](ovrEyeType eye) {
 				const auto& vp = _sceneLayer.Viewport[eye];
 				glViewport(vp.Pos.x, vp.Pos.y, vp.Size.w, vp.Size.h);
 				_sceneLayer.RenderPose[eye] = eyePoses[eye];
-				renderSkyRight(_eyeProjections[eye], ovr::toGlm(eyePoses[eye]));
-				renderScene(_eyeProjections[eye], ovr::toGlm(eyePoses[eye]));
+				
+				if (_scene_state != 1) renderSkyRight(_eyeProjections[eye], ovr::toGlm(eyePoses[eye], 1, _tracking_state, origOrientation, origEyePoses));
+				if (_scene_state != 2) renderScene(_eyeProjections[eye], ovr::toGlm(eyePoses[eye], 1, _tracking_state, origOrientation, origEyePoses));
 			});
 			ovr::for_left_eye([&](ovrEyeType eye) {
 				const auto& vp = _sceneLayer.Viewport[eye];
 				glViewport(vp.Pos.x, vp.Pos.y, vp.Size.w, vp.Size.h);
 				_sceneLayer.RenderPose[eye] = eyePoses[eye];
-				renderSkyLeft(_eyeProjections[eye], ovr::toGlm(eyePoses[eye]));
-				renderScene(_eyeProjections[eye], ovr::toGlm(eyePoses[eye]));
+				if (_scene_state != 1) renderSkyLeft(_eyeProjections[eye], ovr::toGlm(eyePoses[eye], 0, _tracking_state, origOrientation, origEyePoses));
+				if (_scene_state != 2) renderScene(_eyeProjections[eye], ovr::toGlm(eyePoses[eye], 0, _tracking_state, origOrientation, origEyePoses));
 			});
 		}
 
@@ -688,15 +745,15 @@ protected:
 				const auto& vp = _sceneLayer.Viewport[eye];
 				glViewport(vp.Pos.x, vp.Pos.y, vp.Size.w, vp.Size.h);
 				_sceneLayer.RenderPose[eye] = eyePoses[eye];
-				renderSkyLeft(_eyeProjections[eye], ovr::toGlm(eyePoses[eye]));
-				renderScene(_eyeProjections[eye], ovr::toGlm(eyePoses[eye]));
+				if (_scene_state != 1) renderSkyLeft(_eyeProjections[eye], ovr::toGlm(eyePoses[eye],1, _tracking_state, origOrientation, origEyePoses));
+				if (_scene_state != 2) renderScene(_eyeProjections[eye], ovr::toGlm(eyePoses[eye],1, _tracking_state, origOrientation, origEyePoses));
 			});
 			ovr::for_left_eye([&](ovrEyeType eye) {
 				const auto& vp = _sceneLayer.Viewport[eye];
 				glViewport(vp.Pos.x, vp.Pos.y, vp.Size.w, vp.Size.h);
 				_sceneLayer.RenderPose[eye] = eyePoses[eye];
-				renderSkyLeft(_eyeProjections[eye], ovr::toGlm(eyePoses[eye]));
-				renderScene(_eyeProjections[eye], ovr::toGlm(eyePoses[eye]));
+				if (_scene_state != 1) renderSkyLeft(_eyeProjections[eye], ovr::toGlm(eyePoses[eye],0, _tracking_state, origOrientation, origEyePoses));
+				if (_scene_state != 2) renderScene(_eyeProjections[eye], ovr::toGlm(eyePoses[eye],0, _tracking_state, origOrientation, origEyePoses));
 			});
 		}
 
@@ -711,8 +768,8 @@ protected:
 				const auto& vp = _sceneLayer.Viewport[eye];
 				glViewport(vp.Pos.x, vp.Pos.y, vp.Size.w, vp.Size.h);
 				_sceneLayer.RenderPose[eye] = eyePoses[eye];
-				renderSkyLeft(_eyeProjections[eye], ovr::toGlm(eyePoses[eye]));
-				renderScene(_eyeProjections[eye], ovr::toGlm(eyePoses[eye]));
+				if (_scene_state != 1) renderSkyLeft(_eyeProjections[eye], ovr::toGlm(eyePoses[eye], 0, _tracking_state, origOrientation, origEyePoses));
+				if (_scene_state != 2) renderScene(_eyeProjections[eye], ovr::toGlm(eyePoses[eye], 0, _tracking_state, origOrientation, origEyePoses));
 			});
 		}
 
@@ -722,8 +779,8 @@ protected:
 				const auto& vp = _sceneLayer.Viewport[eye];
 				glViewport(vp.Pos.x, vp.Pos.y, vp.Size.w, vp.Size.h);
 				_sceneLayer.RenderPose[eye] = eyePoses[eye];
-				renderSkyRight(_eyeProjections[eye], ovr::toGlm(eyePoses[eye]));
-				renderScene(_eyeProjections[eye], ovr::toGlm(eyePoses[eye]));
+				if (_scene_state != 1) renderSkyRight(_eyeProjections[eye], ovr::toGlm(eyePoses[eye],1, _tracking_state, origOrientation, origEyePoses));
+				if (_scene_state != 2) renderScene(_eyeProjections[eye], ovr::toGlm(eyePoses[eye],1, _tracking_state, origOrientation, origEyePoses));
 			});
 			ovr::for_left_eye([&](ovrEyeType eye) {
 				const auto& vp = _sceneLayer.Viewport[eye];
