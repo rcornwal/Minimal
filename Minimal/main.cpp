@@ -452,6 +452,7 @@ private:
 	uvec2 _mirrorSize;
 
 	ovrEyeRenderDesc EyeRenderDesc[2];
+	float IOD = 0.0f;
 
 	GLuint _view_state = 0;
 	GLboolean a_button_down = false;
@@ -600,8 +601,20 @@ protected:
 
 	void draw() final override {
 
+		ovrInputState inputState;
+		ovr_GetInputState(_session, ovrControllerType_Touch, &inputState);
+
+		// Modifies IPD distance
 		ovrPosef eyePoses[2];
 		ovr_GetEyePoses(_session, frame, true, _viewScaleDesc.HmdToEyeOffset, eyePoses, &_sceneLayer.SensorSampleTime);
+		if (inputState.Thumbstick[ovrHand_Right].x > 0) {
+			IOD += 0.01f * inputState.Thumbstick[ovrHand_Right].x;
+		}
+		else if (inputState.Thumbstick[ovrHand_Right].x < 0) {
+			IOD += 0.01f * inputState.Thumbstick[ovrHand_Right].x;
+		}
+		eyePoses[0].Position.x -= IOD;
+		eyePoses[1].Position.x += IOD;
 		
 		int curIndex;
 		ovr_GetTextureSwapChainCurrentIndex(_session, _eyeTexture, &curIndex);
@@ -630,7 +643,7 @@ protected:
 	}
 
 	void renderToEyes(ovrPosef * eyePoses) {
-		// Input state controls what renders to each eye
+
 		ovrInputState inputState;
 		ovr_GetInputState(_session, ovrControllerType_Touch, &inputState);
 
@@ -662,6 +675,15 @@ protected:
 
 		// Mono rendering
 		else if (_view_state == 1) {
+			ovrVector3f mono_vector = {
+				(_viewScaleDesc.HmdToEyeOffset[0].x + _viewScaleDesc.HmdToEyeOffset[1].x) / 2,
+				(_viewScaleDesc.HmdToEyeOffset[0].x + _viewScaleDesc.HmdToEyeOffset[1].y) / 2,
+				(_viewScaleDesc.HmdToEyeOffset[0].x + _viewScaleDesc.HmdToEyeOffset[1].z) / 2,
+			};
+
+			ovrVector3f mono_vectors[2] = { mono_vector, mono_vector };
+
+			ovr_GetEyePoses(_session, frame, true, mono_vectors, eyePoses, &_sceneLayer.SensorSampleTime);
 			ovr::for_right_eye([&](ovrEyeType eye) {
 				const auto& vp = _sceneLayer.Viewport[eye];
 				glViewport(vp.Pos.x, vp.Pos.y, vp.Size.w, vp.Size.h);
