@@ -1,6 +1,8 @@
 /////////////////////
 // GameScene.h
 /////////////////////
+#pragma once
+
 #include <iostream>
 #include <memory>
 #include <exception>
@@ -21,8 +23,6 @@
 #include <OVR_CAPI.h>
 #include <OVR_CAPI_GL.h>
 
-#include "rpc\server.h"
-
 #define FAIL(X) throw std::runtime_error(X)
 
 // Import the most commonly used types into the default namespace
@@ -42,6 +42,8 @@ using glm::quat;
 #include "Controller.h"
 #include "Physics.h"
 #include "GameObject.h"
+#include "Network.h"
+#include "rpc\server.h"
 
 using namespace glm;
 
@@ -50,6 +52,8 @@ using namespace glm;
 class GameScene {
 
 private:
+
+	Network network;
 
 	Controller leftController;
 	//Controller rightController;
@@ -71,6 +75,8 @@ public:
 	} hmdData;
 
 	GameScene() {
+		//Network::CreateServer();
+		
 
 	}
 
@@ -79,7 +85,7 @@ public:
 	}
 
 	void render(const mat4 & projection, const mat4 & modelview) {
-
+		network.CreateServer();
 		// Controlls for the left controller
 		/*
 		leftController.inputState = hmdData.inputState;

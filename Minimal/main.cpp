@@ -25,7 +25,6 @@ limitations under the License.
 #include <algorithm>
 #include <Windows.h>
 
-#include "CaveScene.h"
 #include "GameScene.h"
 
 #define __STDC_FORMAT_MACROS 1
@@ -801,12 +800,18 @@ protected:
 };
 
 // Execute our example class
+#include "rpc/server.h"
+
 int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
 	int result = -1;
+
+	//rpc::server srv(8080);
+
 	try {
 		if (!OVR_SUCCESS(ovr_Initialize(nullptr))) {
 			FAIL("Failed to initialize the Oculus SDK");
 		}
+		
 		result = ExampleApp().run();
 	}
 	catch (std::exception & error) {

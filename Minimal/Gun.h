@@ -8,6 +8,7 @@
 #include "Model.h"
 #include "Laser.h"
 #include "Ball.h"
+#include "Network.h"
 
 // Std includes
 #include <stdio.h>
@@ -40,6 +41,7 @@ struct Ray {
 class Gun {
 public:
 	glm::vec3 muzzlePos;
+
 	glm::vec3 position;
 	glm::vec4 rotation;
 	glm::vec3 scale;
@@ -54,6 +56,9 @@ public:
 	glm::vec3 GetMuzzlePos();
 	void ShootBall();
 	glm::vec3 GetColor();
+	glm::vec3 GetPos();
+	glm::vec4 GetRot();
+	glm::vec3 GetScale();
 
 	Ray ray;
 private:
@@ -67,6 +72,4 @@ private:
 
 	bool triggerPress = false;
 
-	/* Functions */
-	glm::mat4 GetModelMatrix();
 };

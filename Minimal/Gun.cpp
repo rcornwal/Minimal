@@ -20,11 +20,10 @@ Gun::Gun() {
 	position = glm::vec3(0, 0, 0);
 	muzzlePos = glm::vec3(0, 1.3f, 3.3f);
 
-}
-
-glm::mat4 Gun::GetModelMatrix() {
-	glm::mat4 modelMat = glm::translate(position);
-	return modelMat;
+	// Bind the getters to the server
+	//rpc::server * srv = Network::GetServer();
+	//srv->bind("GetGunPos", &Gun::GetPos);
+	glm::vec3 p = GetPos();
 }
 
 glm::vec3 Gun::GetColor() {
@@ -112,3 +111,14 @@ void Gun::Render(glm::mat4 view, glm::mat4 proj) {
 
 }
 
+glm::vec3 Gun::GetPos() {
+	return position;
+}
+
+glm::vec4 Gun::GetRot() {
+	return rotation;
+}
+
+glm::vec3 Gun::GetScale() {
+	return scale;
+}
