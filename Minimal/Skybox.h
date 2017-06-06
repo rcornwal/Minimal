@@ -34,6 +34,7 @@ public:
 
 	Skybox(bool left, GLfloat dist);
 	void Render(glm::mat4 view, glm::mat4 proj);
+	void Render(glm::mat4 view, glm::mat4 proj, GLuint framebuffer);
 	void Draw();
 	glm::vec3 color;
 

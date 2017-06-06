@@ -43,6 +43,9 @@ public:
 	/* Functions*/
 	Mesh(vector<Vertex> vertices, vector<GLuint> indices, vector<Texture> textures);
 	void Draw(Shader shader);
+	glm::vec3 GetMax();
+	glm::vec3 GetMin();
+
 private:
 	/* Render Data */
 	GLuint VAO, VBO, EBO;

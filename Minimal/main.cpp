@@ -25,8 +25,8 @@ limitations under the License.
 #include <algorithm>
 #include <Windows.h>
 
+#include "CaveScene.h"
 #include "GameScene.h"
-#include "StereoScene.h"
 
 #define __STDC_FORMAT_MACROS 1
 
@@ -373,13 +373,13 @@ namespace ovr {
 	inline mat4 toGlm(const ovrPosef & op, GLuint eye, GLuint _tracking_state, glm::mat4 &origOrientation, glm::vec3 origEyePoses[2]) {
 
 		mat4 orientation = origOrientation;
-		if (_tracking_state == 1 || _tracking_state == 0) {
+		if (_tracking_state == 0) {
 			orientation = glm::mat4_cast(toGlm(op.Orientation));
 			origOrientation = orientation;
 		}
 
 		mat4 translation = glm::translate(mat4(), origEyePoses[eye]);
-		if (_tracking_state == 2 || _tracking_state == 0) {
+		if (_tracking_state == 0) {
 			translation = glm::translate(mat4(), ovr::toGlm(op.Position));
 			origEyePoses[eye] = ovr::toGlm(op.Position);
 		}
@@ -451,7 +451,7 @@ class RiftApp : public GlfwApp, public RiftManagerApp {
 public:
 
 private:
-	GLuint _fbo{ 0 };
+	
 	GLuint _depthBuffer{ 0 };
 	ovrTextureSwapChain _eyeTexture;
 
@@ -466,7 +466,6 @@ private:
 	ovrViewScaleDesc _viewScaleDesc;
 
 	uvec2 _renderTargetSize;
-	uvec2 _mirrorSize;
 
 	ovrEyeRenderDesc EyeRenderDesc[2];
 	float IOD = 0.0f;
@@ -551,6 +550,8 @@ public:
 	}
 
 protected:
+	uvec2 _mirrorSize;
+	GLuint _fbo{ 0 };
 
 	GLFWwindow * createRenderingTarget(uvec2 & outSize, ivec2 & outPosition) override {
 		return glfw::createWindow(_mirrorSize);
@@ -635,40 +636,6 @@ protected:
 		ovrVector3f left_offset = _viewScaleDesc.HmdToEyeOffset[0];
 		ovrVector3f right_offset = _viewScaleDesc.HmdToEyeOffset[1];
 
-		if (inputState.Thumbstick[ovrHand_Right].x > 0 && IOD + right_offset.x <= 1) {
-			IOD += 0.01f * inputState.Thumbstick[ovrHand_Right].x;
-		}
-		else if (inputState.Thumbstick[ovrHand_Right].x < 0 && IOD - left_offset.x >= 0) {
-			IOD += 0.01f * inputState.Thumbstick[ovrHand_Right].x;
-		}
-
-		left_offset.x -= IOD;
-		right_offset.x += IOD;
-
-		// Resets IOD on right thumb press
-		if (inputState.Buttons & ovrButton_RThumb && !r_thumb_down) {
-			left_offset.x -= IOD;
-			right_offset.x += IOD;
-			IOD = 0;
-			r_thumb_down = true;
-		}
-		else if (!inputState.Buttons && r_thumb_down) {
-			r_thumb_down = false;
-		}
-
-		if (left_offset.x > 0) {
-			left_offset.x = 0;
-		}
-		if (right_offset.x < 0) {
-			right_offset.x = 0;
-		}
-		if (left_offset.x < -1) {
-			left_offset.x = -1;
-		}
-		if (right_offset.x > 1) {
-			right_offset.x = 1;
-		}
-
 		// Right might be left, left might be right, my bad lol
 		ovrVector3f offsets[2] = { left_offset, right_offset };
 		ovr_GetEyePoses(_session, frame, true, offsets, eyePoses, &_sceneLayer.SensorSampleTime);
@@ -685,12 +652,14 @@ protected:
 		// Render to each eye accordingly
 		renderToEyes(eyePoses);
 
+		// render the frame to the window
 		glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0);
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 		ovr_CommitTextureSwapChain(_session, _eyeTexture);
 		ovrLayerHeader* headerList = &_sceneLayer.Header;
 		ovr_SubmitFrame(_session, frame, &_viewScaleDesc, &headerList, 1);
 
+		// for desktop display
 		GLuint mirrorTextureId;
 		ovr_GetMirrorTextureBufferGL(_session, _mirrorTexture, &mirrorTextureId);
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, _mirrorFbo);
@@ -704,27 +673,9 @@ protected:
 		ovrInputState inputState;
 		ovr_GetInputState(_session, ovrControllerType_Touch, &inputState);
 
-		// view toggling
-		if (inputState.Buttons & ovrTouch_A && !a_button_down) {
-			_view_state = (_view_state + 1) % 4;
-			a_button_down = true;
-		}
-		else if (!inputState.Buttons && a_button_down) {
-			a_button_down = false;
-		}
-
-		// scene toggling
-		if (inputState.Buttons & ovrTouch_X && !x_button_down) {
-			_scene_state = (_scene_state + 1) % 3;
-			x_button_down = true;
-		}
-		else if (!inputState.Buttons && x_button_down) {
-			x_button_down = false;
-		}
-
 		// tracking toggling
 		if (inputState.Buttons & ovrTouch_B && !b_button_down) {
-			_tracking_state = (_tracking_state + 1) % 4;
+			_tracking_state = (_tracking_state + 1) % 2;
 			b_button_down = true;
 		}
 		else if (!inputState.Buttons && b_button_down) {
@@ -733,101 +684,47 @@ protected:
 		
 
 		// 3D stereo rendering
-		if (_view_state == 0) {
-			ovr::for_right_eye([&](ovrEyeType eye) {
-				const auto& vp = _sceneLayer.Viewport[eye];
-				glViewport(vp.Pos.x, vp.Pos.y, vp.Size.w, vp.Size.h);
-				_sceneLayer.RenderPose[eye] = eyePoses[eye];
-				
-				if (_scene_state != 1) renderSkyRight(_eyeProjections[eye], ovr::toGlm(eyePoses[eye], 1, _tracking_state, origOrientation, origEyePoses));
-				if (_scene_state != 2) renderScene(_eyeProjections[eye], ovr::toGlm(eyePoses[eye], 1, _tracking_state, origOrientation, origEyePoses));
-			});
-			ovr::for_left_eye([&](ovrEyeType eye) {
-				const auto& vp = _sceneLayer.Viewport[eye];
-				glViewport(vp.Pos.x, vp.Pos.y, vp.Size.w, vp.Size.h);
-				_sceneLayer.RenderPose[eye] = eyePoses[eye];
-				if (_scene_state != 1) renderSkyLeft(_eyeProjections[eye], ovr::toGlm(eyePoses[eye], 0, _tracking_state, origOrientation, origEyePoses));
-				if (_scene_state != 2) renderScene(_eyeProjections[eye], ovr::toGlm(eyePoses[eye], 0, _tracking_state, origOrientation, origEyePoses));
-			});
-		}
+		
+		ovr::for_left_eye([&](ovrEyeType eye) {
+			const auto& vp = _sceneLayer.Viewport[eye];
+			glm::vec4 viewport(vp.Pos.x, vp.Pos.y, vp.Size.w, vp.Size.h);
+			glViewport(vp.Pos.x, vp.Pos.y, vp.Size.w, vp.Size.h);
+			_sceneLayer.RenderPose[eye] = eyePoses[eye];
+			renderScene(_eyeProjections[eye], ovr::toGlm(eyePoses[eye], 0, _tracking_state, origOrientation, origEyePoses), viewport, 0);
 
-		// Mono rendering
-		else if (_view_state == 1) {
-			ovrVector3f mono_vector = {
-				(_viewScaleDesc.HmdToEyeOffset[0].x + _viewScaleDesc.HmdToEyeOffset[1].x) / 2,
-				(_viewScaleDesc.HmdToEyeOffset[0].x + _viewScaleDesc.HmdToEyeOffset[1].y) / 2,
-				(_viewScaleDesc.HmdToEyeOffset[0].x + _viewScaleDesc.HmdToEyeOffset[1].z) / 2,
-			};
+		});
+		
+		
+		ovr::for_right_eye([&](ovrEyeType eye) {
+			const auto& vp = _sceneLayer.Viewport[eye];
+			glm::vec4 viewport(vp.Pos.x, vp.Pos.y, vp.Size.w, vp.Size.h);
+			glViewport(vp.Pos.x, vp.Pos.y, vp.Size.w, vp.Size.h);
+			_sceneLayer.RenderPose[eye] = eyePoses[eye];
+			renderScene(_eyeProjections[eye], ovr::toGlm(eyePoses[eye], 1, _tracking_state, origOrientation, origEyePoses), viewport, 1);
+		});
+		
+		
+		/*
+		ovr::for_each_eye([&](ovrEyeType eye) {
+			const auto& vp = _sceneLayer.Viewport[eye];
+			glViewport(vp.Pos.x, vp.Pos.y, vp.Size.w, vp.Size.h);
+			_sceneLayer.RenderPose[eye] = eyePoses[eye];
+			renderScene(_eyeProjections[eye], ovr::toGlm(eyePoses[eye]));
+		});
+		*/
 
-			ovrVector3f mono_vectors[2] = { mono_vector, mono_vector };
-
-			ovr_GetEyePoses(_session, frame, true, mono_vectors, eyePoses, &_sceneLayer.SensorSampleTime);
-			ovr::for_right_eye([&](ovrEyeType eye) {
-				const auto& vp = _sceneLayer.Viewport[eye];
-				glViewport(vp.Pos.x, vp.Pos.y, vp.Size.w, vp.Size.h);
-				_sceneLayer.RenderPose[eye] = eyePoses[eye];
-				if (_scene_state != 1) renderSkyLeft(_eyeProjections[eye], ovr::toGlm(eyePoses[eye],1, _tracking_state, origOrientation, origEyePoses));
-				if (_scene_state != 2) renderScene(_eyeProjections[eye], ovr::toGlm(eyePoses[eye],1, _tracking_state, origOrientation, origEyePoses));
-			});
-			ovr::for_left_eye([&](ovrEyeType eye) {
-				const auto& vp = _sceneLayer.Viewport[eye];
-				glViewport(vp.Pos.x, vp.Pos.y, vp.Size.w, vp.Size.h);
-				_sceneLayer.RenderPose[eye] = eyePoses[eye];
-				if (_scene_state != 1) renderSkyLeft(_eyeProjections[eye], ovr::toGlm(eyePoses[eye],0, _tracking_state, origOrientation, origEyePoses));
-				if (_scene_state != 2) renderScene(_eyeProjections[eye], ovr::toGlm(eyePoses[eye],0, _tracking_state, origOrientation, origEyePoses));
-			});
-		}
-
-		// Left eye bear, right eye dark rendering
-		else if (_view_state == 2) {
-			ovr::for_right_eye([&](ovrEyeType eye) {
-				const auto& vp = _sceneLayer.Viewport[eye];
-				glViewport(vp.Pos.x, vp.Pos.y, vp.Size.w, vp.Size.h);
-				_sceneLayer.RenderPose[eye] = eyePoses[eye];
-			});
-			ovr::for_left_eye([&](ovrEyeType eye) {
-				const auto& vp = _sceneLayer.Viewport[eye];
-				glViewport(vp.Pos.x, vp.Pos.y, vp.Size.w, vp.Size.h);
-				_sceneLayer.RenderPose[eye] = eyePoses[eye];
-				if (_scene_state != 1) renderSkyLeft(_eyeProjections[eye], ovr::toGlm(eyePoses[eye], 0, _tracking_state, origOrientation, origEyePoses));
-				if (_scene_state != 2) renderScene(_eyeProjections[eye], ovr::toGlm(eyePoses[eye], 0, _tracking_state, origOrientation, origEyePoses));
-			});
-		}
-
-		// Right eye bear, left eye dark rendering
-		else if (_view_state == 3) {
-			ovr::for_right_eye([&](ovrEyeType eye) {
-				const auto& vp = _sceneLayer.Viewport[eye];
-				glViewport(vp.Pos.x, vp.Pos.y, vp.Size.w, vp.Size.h);
-				_sceneLayer.RenderPose[eye] = eyePoses[eye];
-				if (_scene_state != 1) renderSkyRight(_eyeProjections[eye], ovr::toGlm(eyePoses[eye],1, _tracking_state, origOrientation, origEyePoses));
-				if (_scene_state != 2) renderScene(_eyeProjections[eye], ovr::toGlm(eyePoses[eye],1, _tracking_state, origOrientation, origEyePoses));
-			});
-			ovr::for_left_eye([&](ovrEyeType eye) {
-				const auto& vp = _sceneLayer.Viewport[eye];
-				glViewport(vp.Pos.x, vp.Pos.y, vp.Size.w, vp.Size.h);
-				_sceneLayer.RenderPose[eye] = eyePoses[eye];
-			});
-		}
 	}
 
-	virtual void renderScene(const glm::mat4 & projection, const glm::mat4 & headPose) = 0;
-	virtual void renderSkyLeft(const glm::mat4 & projection, const glm::mat4 & headPose) = 0;
-	virtual void renderSkyRight(const glm::mat4 & projection, const glm::mat4 & headPose) = 0;
+	virtual void renderScene(const glm::mat4 & projection, const glm::mat4 & headPose, const glm::vec4 viewport, const int eyeNum) = 0;
 };
 
 //////////////////////////////////////////////////////////////////////
-//
-// The remainder of this code is specific to the scene we want to 
-// render.  I use oglplus to render an array of cubes, but your 
-// application would perform whatever rendering you want
-//
-
 // An example application that renders a simple cube
+//////////////////////////////////////////////////////////////////////
+
 
 class ExampleApp : public RiftApp {
-	std::shared_ptr<GameScene> cubeScene;
-	std::shared_ptr<StereoScene> stereoScene;
+	std::shared_ptr<GameScene> caveScene;
 
 public:
 	ExampleApp() { }
@@ -877,36 +774,30 @@ protected:
 		glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
 		glEnable(GL_DEPTH_TEST);
 		ovr_RecenterTrackingOrigin(_session);
-		cubeScene = std::shared_ptr<GameScene>(new GameScene());
-		stereoScene = std::shared_ptr<StereoScene>(new StereoScene());
+
+		caveScene = std::shared_ptr<GameScene>(new GameScene());
 	}
 
 	void shutdownGl() override {
-		cubeScene.reset();
+		caveScene.reset();
 	}
 
-	void renderScene(const glm::mat4 & projection, const glm::mat4 & headPose) override {
+	void renderScene(const glm::mat4 & projection, const glm::mat4 & headPose, glm::vec4 viewport, const int eyeNum) override {
 		
 		ovrInputState inputState;
 		ovr_GetInputState(_session, ovrControllerType_Touch, &inputState);
 
 		// pass in info about the hmd to our scene
-		cubeScene->hmdData.leftControllerPos = leftControllerPos();
-		cubeScene->hmdData.rightControllerPos = rightControllerPos();
-		cubeScene->hmdData.leftControllerOrientation = leftControllerOrientation();
-		cubeScene->hmdData.rightControllerOrientation = rightControllerOrientation();
-		cubeScene->hmdData.inputState = inputState;
+		caveScene->hmdData.leftControllerPos = leftControllerPos();
+		caveScene->hmdData.rightControllerPos = rightControllerPos();
+		caveScene->hmdData.leftControllerOrientation = leftControllerOrientation();
+		caveScene->hmdData.rightControllerOrientation = rightControllerOrientation();
+		caveScene->hmdData.inputState = inputState;
 
-		cubeScene->render(projection, glm::inverse(headPose));
+		// render the scene
+		caveScene->render(projection, glm::inverse(headPose));
 	}
 
-	void renderSkyLeft(const glm::mat4 & projection, const glm::mat4 & headPose) {
-		stereoScene->renderLeft(projection, glm::inverse(headPose));
-	}
-
-	void renderSkyRight(const glm::mat4 & projection, const glm::mat4 & headPose) {
-		stereoScene->renderRight(projection, glm::inverse(headPose));
-	}
 };
 
 // Execute our example class

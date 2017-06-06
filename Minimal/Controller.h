@@ -30,7 +30,7 @@
 #include <OVR_CAPI.h>
 #include <OVR_CAPI_GL.h>
 
-struct Ray {
+struct ControllerRay {
 	glm::vec3 origin;
 	glm::vec3 dir;
 	float dist;
@@ -52,7 +52,7 @@ public:
 
 	glm::vec3 GetColor();
 
-	Ray ray;
+	ControllerRay ray;
 private:
 	/* Data */
 	Laser laser;

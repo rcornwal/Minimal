@@ -35,11 +35,17 @@ public:
 
 	TexCube();
 	void Render(glm::mat4 view, glm::mat4 proj);
+	void Render(glm::mat4 view, glm::mat4 proj, GLuint framebuffer);
 	void Draw();
 	glm::vec3 color;
 
 	void ScaleUp();
 	void ScaleDown();
+	void MoveRight();
+	void MoveLeft();
+	void MoveUp();
+	void MoveDown();
+
 	void ResetScale();
 
 private:

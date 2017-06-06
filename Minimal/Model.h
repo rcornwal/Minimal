@@ -29,6 +29,8 @@ public:
 	Model() {}
 	Model(GLchar* path) { this->LoadModel(path); }
 	void Draw(Shader shader);
+	glm::vec3 GetMax();
+	glm::vec3 GetMin();
 private:
 
 	/* Data */
@@ -42,4 +44,5 @@ private:
 	Mesh ProcessMesh(aiMesh* mesh, const aiScene* scene);
 	vector<Texture> LoadMaterialTextures(aiMaterial* mat, aiTextureType type, string typeName);
 	GLint TextureFromFile(const char* path, string directory);
+
 };

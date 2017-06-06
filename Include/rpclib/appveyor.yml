@@ -1,0 +1,30 @@
+version: 1.0.{build}
+os: Visual Studio 2015
+clone_folder: C:\projects\rpc
+test: off
+
+branches:
+  only:
+    - master
+    - dev
+
+configuration:
+  - Release
+
+environment:
+  matrix:
+    - CMAKE_PLATFORM: "Visual Studio 14 2015"
+
+install: true
+
+build_script:
+  - cd c:\projects\rpc
+  - git submodule init
+  - git submodule update --init --recursive
+  - md build
+  - cd build
+  - cmake -DRPCLIB_ENABLE_COVERAGE=ON -DRPCLIB_BUILD_TESTS=ON -G "%CMAKE_PLATFORM%" ..
+  - set MSBuildLogger="C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+  - set MSBuildOptions=/v:m /p:Configuration=%Configuration% /logger:%MSBuildLogger%
+  - msbuild %MSBuildOptions% rpc.sln
+  - .\output\bin\Release\rpc_test.exe

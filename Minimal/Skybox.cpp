@@ -98,22 +98,14 @@ Skybox::Skybox(bool left, GLfloat dist) {
 	GLchar* texturePathPY;
 	GLchar* texturePathPZ;
 
-	if (left) {
-		texturePathNX = "./Models/skybox/left-ppm/nx.ppm";
-		texturePathNY = "./Models/skybox/left-ppm/ny.ppm";
-		texturePathNZ = "./Models/skybox/left-ppm/nz.ppm";
-		texturePathPX = "./Models/skybox/left-ppm/px.ppm";
-		texturePathPY = "./Models/skybox/left-ppm/py.ppm";
-		texturePathPZ = "./Models/skybox/left-ppm/pz.ppm";
-	}
-	else {
-		texturePathNX = "./Models/skybox/right-ppm/nx.ppm";
-		texturePathNY = "./Models/skybox/right-ppm/ny.ppm";
-		texturePathNZ = "./Models/skybox/right-ppm/nz.ppm";
-		texturePathPX = "./Models/skybox/right-ppm/px.ppm";
-		texturePathPY = "./Models/skybox/right-ppm/py.ppm";
+
+		texturePathNX = "./Models/skybox/right-ppm/pz.ppm";
+		texturePathNY = "./Models/skybox/right-ppm/pz.ppm";
+		texturePathNZ = "./Models/skybox/right-ppm/pz.ppm";
+		texturePathPX = "./Models/skybox/right-ppm/pz.ppm";
+		texturePathPY = "./Models/skybox/right-ppm/pz.ppm";
 		texturePathPZ = "./Models/skybox/right-ppm/pz.ppm";
-	}
+
 
 	vector<const GLchar*> faces;
 	faces.push_back(texturePathPX);
@@ -138,6 +130,37 @@ void Skybox::Draw() {
 }
 
 void Skybox::Render(glm::mat4 view, glm::mat4 proj) {
+
+	skyboxShader.Use();
+
+	// Bind Textures using texture units
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, skyTexture);
+	glUniform1i(glGetUniformLocation(skyboxShader.Program, "ourTexture"), 0);
+
+	// Calculate the toWorld matrix for the model
+	glm::mat4 model;
+	model = glm::translate(model, position);
+	model = glm::rotate(model, glm::radians(95.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	model = glm::scale(model, scale);
+
+	// Set the model view projection matrix in our shader
+	glUniformMatrix4fv(glGetUniformLocation(skyboxShader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
+	glUniformMatrix4fv(glGetUniformLocation(skyboxShader.Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
+	glUniformMatrix4fv(glGetUniformLocation(skyboxShader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(proj));
+
+	Draw();
+}
+
+void Skybox::Render(glm::mat4 view, glm::mat4 proj, GLuint framebuffer) {
+
+	/////////////////////////////////////////////////////
+	// Bind to framebuffer and draw to color texture 
+	// as we normally would.
+	// //////////////////////////////////////////////////
+	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	skyboxShader.Use();
 

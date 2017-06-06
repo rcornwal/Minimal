@@ -120,8 +120,12 @@ vector<Texture> Model::LoadMaterialTextures(aiMaterial* mat, aiTextureType type,
 	return textures;
 }
 
+
 unsigned char* loadPPM(const char* filename, int& width, int& height)
 {
+	OutputDebugString("Loading ppm file: ");
+	OutputDebugString(filename);
+	OutputDebugString("\n");
 	const int BUFSIZE = 128;
 	FILE* fp;
 	unsigned int read;
@@ -133,6 +137,7 @@ unsigned char* loadPPM(const char* filename, int& width, int& height)
 	if ((fp = fopen(filename, "rb")) == NULL)
 	{
 		std::cerr << "error reading ppm file, could not locate " << filename << std::endl;
+		OutputDebugString("Could not locate ppm file!\n");
 		width = 0;
 		height = 0;
 		return 0;
@@ -163,6 +168,7 @@ unsigned char* loadPPM(const char* filename, int& width, int& height)
 	if (read != 1)
 	{
 		std::cerr << "error parsing ppm file, incomplete data" << std::endl;
+		OutputDebugString("Error parsing ppm file, incomplete data!\n");
 		delete[] rawData;
 		width = 0;
 		height = 0;
@@ -172,7 +178,6 @@ unsigned char* loadPPM(const char* filename, int& width, int& height)
 
 	return rawData;
 }
-
 
 GLint Model::TextureFromFile(const char* filename, string dir) {
 	// generate texture data
@@ -192,4 +197,28 @@ GLint Model::TextureFromFile(const char* filename, string dir) {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	return textureID;
+}
+
+glm::vec3 Model::GetMax() {
+	glm::vec3 max(-INFINITY, -INFINITY, -INFINITY);
+	for (int i = 0; i < meshes.size(); i++) {
+		Mesh m = meshes[i];
+		glm::vec3 mMax = m.GetMax();
+		max.x = (mMax.x > max.x) ? mMax.x : max.x;
+		max.y = (mMax.y > max.y) ? mMax.y : max.y;
+		max.z = (mMax.z > max.z) ? mMax.z : max.z;
+	}
+	return max;
+}
+
+glm::vec3 Model::GetMin() {
+	glm::vec3 min(INFINITY, INFINITY, INFINITY);
+	for (int i = 0; i < meshes.size(); i++) {
+		Mesh m = meshes[i];
+		glm::vec3 mMax = m.GetMin();
+		min.x = (mMax.x < min.x) ? mMax.x : min.x;
+		min.y = (mMax.y < min.y) ? mMax.y : min.y;
+		min.z = (mMax.z < min.z) ? mMax.z : min.z;
+	}
+	return min;
 }

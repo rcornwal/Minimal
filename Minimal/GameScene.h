@@ -21,7 +21,7 @@
 #include <OVR_CAPI.h>
 #include <OVR_CAPI_GL.h>
 
-#define MAX_MOLECULES 200
+#include "rpc\server.h"
 
 #define FAIL(X) throw std::runtime_error(X)
 
@@ -36,9 +36,12 @@ using glm::vec3;
 using glm::vec4;
 using glm::quat;
 
-#include "TexCube.h"
 #include "Skybox.h"
+#include "Gun.h"
+#include "Environment.h"
 #include "Controller.h"
+#include "Physics.h"
+#include "GameObject.h"
 
 using namespace glm;
 
@@ -48,12 +51,11 @@ class GameScene {
 
 private:
 
-	TexCube texCube;
-
 	Controller leftController;
-	Controller rightController;
+	//Controller rightController;
 
-
+	Gun gun;
+	Environment env;
 	int gameState = 0;
 	GLboolean l_thumb_down = false;
 
@@ -78,9 +80,8 @@ public:
 
 	void render(const mat4 & projection, const mat4 & modelview) {
 
-		texCube.Render(modelview, projection);
-
 		// Controlls for the left controller
+		/*
 		leftController.inputState = hmdData.inputState;
 		leftController.btn1 = ovrTouch_X;
 		leftController.btn2 = ovrTouch_Y;
@@ -89,38 +90,47 @@ public:
 		leftController.position = hmdData.leftControllerPos;
 		leftController.rotation = hmdData.leftControllerOrientation;
 		leftController.Render(modelview, projection);
-
-		// Controlls for the right controller
-		rightController.inputState = hmdData.inputState;
-		rightController.btn1 = ovrTouch_A;
-		rightController.btn2 = ovrTouch_B;
-		rightController.hand = ovrHand_Right;
-
-		rightController.position = hmdData.rightControllerPos;
-		rightController.rotation = hmdData.rightControllerOrientation;
-		rightController.Render(modelview, projection);
+		*/
 
 		// Reset the game
+		/*
 		if (gameState != 0 && hmdData.inputState.Buttons & ovrTouch_A) {
-			resetGame();
+		resetGame();
 		}
 
 		// Get the left stick
 		if (hmdData.inputState.Thumbstick[ovrHand_Left].x > 0) {
-			texCube.ScaleDown();
+		texCube.ScaleDown();
 		}
 		else if (hmdData.inputState.Thumbstick[ovrHand_Left].x < 0) {
-			texCube.ScaleUp();
+		texCube.ScaleUp();
 		}
 
 		// Resets scale on left thumb press
 		if (hmdData.inputState.Buttons & ovrButton_LThumb && !l_thumb_down) {
-			texCube.ResetScale();
-			l_thumb_down = true;
+		texCube.ResetScale();
+		l_thumb_down = true;
 		}
 		else if (!hmdData.inputState.Buttons && l_thumb_down) {
-			l_thumb_down = false;
+		l_thumb_down = false;
 		}
+		*/
 
+		Physics::debug = true;
+		Physics::Update(modelview, projection);
+
+		// Controlls for the right controller
+		gun.inputState = hmdData.inputState;
+		gun.btn1 = ovrTouch_A;
+		gun.btn2 = ovrTouch_B;
+		gun.hand = ovrHand_Right;
+
+		gun.position = hmdData.rightControllerPos;
+		gun.rotation = hmdData.rightControllerOrientation;
+		gun.Render(modelview, projection);
+
+		// Render our environment (floor, walls, etc)
+		env.Render(modelview, projection);
+		GameObject::RenderAll(modelview, projection);
 	}
 };

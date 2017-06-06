@@ -76,3 +76,27 @@ void Mesh::Draw(Shader shader) {
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 }
+
+glm::vec3 Mesh::GetMax() {
+	glm::vec3 max = glm::vec3(-INFINITY, -INFINITY, -INFINITY);
+	for (int i = 0; i < vertices.size(); i++) {
+		Vertex v = vertices[i];
+		glm::vec3 vP = v.Position;
+		max.x = (vP.x > max.x) ? vP.x : max.x;
+		max.y = (vP.y > max.y) ? vP.y : max.y;
+		max.z = (vP.z > max.z) ? vP.z : max.z;
+	}
+	return max;
+}
+
+glm::vec3 Mesh::GetMin() {
+	glm::vec3 min = glm::vec3(INFINITY, INFINITY, INFINITY);
+	for (int i = 0; i < vertices.size(); i++) {
+		Vertex v = vertices[i];
+		glm::vec3 vP = v.Position;
+		min.x = (vP.x < min.x) ? vP.x : min.x;
+		min.y = (vP.y < min.y) ? vP.y : min.y;
+		min.z = (vP.z < min.z) ? vP.z : min.z;
+	}
+	return min;
+}

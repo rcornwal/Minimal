@@ -1,0 +1,53 @@
+dist: trusty
+language: cpp
+compiler:
+  #- clang
+  - g++
+
+branches:
+  only:
+    - master
+    - dev
+    - osx_support
+
+env:
+  global:
+    - CI_HOME=`pwd`
+
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+      - llvm-toolchain-precise-3.7
+      - george-edison55-precise-backports
+    packages:
+      - gcc-5
+      - g++-5
+      - cmake
+      - cmake-data
+
+install:
+  - pip install --user cpp-coveralls
+  - if [ "$CXX" = "g++" ]; then export CXX="g++-5" CC="gcc-5"; fi
+
+script:
+  - g++-5 --version
+  - gcc-5 --version
+  - cd $CI_HOME
+  - git submodule init
+  - git submodule update --init --recursive
+  - mkdir build14 && cd build14
+  - cmake -DRPCLIB_ENABLE_COVERAGE=ON -DRPCLIB_BUILD_TESTS=ON -DRPCLIB_CXX_STANDARD=14 ..
+  - make -j2
+  - cd ..
+  - mkdir build11 && cd build11
+  - cmake -DRPCLIB_ENABLE_COVERAGE=ON -DRPCLIB_BUILD_TESTS=ON -DRPCLIB_CXX_STANDARD=11 ..
+  - make -j2
+  - cd ..
+
+after_success:
+  - ./build14/output/bin/rpc_test
+  - ./build11/output/bin/rpc_test
+  - coveralls --exclude dependencies --exclude test --exclude include/rpc/msgpack --exclude include/rcp/msgpack.hpp --gcov /usr/bin/gcov-5
+
+
