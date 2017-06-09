@@ -25,25 +25,12 @@ limitations under the License.
 #include <algorithm>
 #include <Windows.h>
 
+#include "LeapApp.h"
 #include "GameScene.h"
 
 #define __STDC_FORMAT_MACROS 1
 
 #define FAIL(X) throw std::runtime_error(X)
-
-///////////////////////////////////////////////////////////////////////////////
-//
-// GLM is a C++ math library meant to mirror the syntax of GLSL 
-//
-
-#include <glm/glm.hpp>
-#include <glm/gtc/noise.hpp>
-#include <glm/gtx/rotate_vector.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtx/transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <glm/gtc/quaternion.hpp>
-#include <glm/gtx/quaternion.hpp>
 
 // Import the most commonly used types into the default namespace
 using glm::ivec3;
@@ -60,8 +47,6 @@ using glm::quat;
 //
 // GLEW gives cross platform access to OpenGL 3.x+ functionality.  
 //
-
-#include <GL/glew.h>
 
 bool checkFramebufferStatus(GLenum target = GL_FRAMEBUFFER) {
 	GLuint status = glCheckFramebufferStatus(target);
@@ -148,8 +133,6 @@ void glDebugCallbackHandler(GLenum source, GLenum type, GLuint id, GLenum severi
 //
 // GLFW provides cross platform window creation
 //
-
-#include <GLFW/glfw3.h>
 
 namespace glfw {
 	inline GLFWwindow * createWindow(const uvec2 & size, const ivec2 & position = ivec2(INT_MIN)) {
@@ -800,24 +783,25 @@ protected:
 };
 
 // Execute our example class
-#include "rpc/server.h"
+//#include "rpc/server.h"
 
 int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
 	int result = -1;
 
 	//rpc::server srv(8080);
 
-	try {
-		if (!OVR_SUCCESS(ovr_Initialize(nullptr))) {
-			FAIL("Failed to initialize the Oculus SDK");
-		}
-		
-		result = ExampleApp().run();
-	}
-	catch (std::exception & error) {
-		OutputDebugStringA(error.what());
-		std::cerr << error.what() << std::endl;
-	}
-	ovr_Shutdown();
+	//try {
+	//	if (!OVR_SUCCESS(ovr_Initialize(nullptr))) {
+	//		FAIL("Failed to initialize the Oculus SDK");
+	//	}
+	//	
+	//	result = ExampleApp().run();
+	//}
+	//catch (std::exception & error) {
+	//	OutputDebugStringA(error.what());
+	//	std::cerr << error.what() << std::endl;
+	//}
+	//ovr_Shutdown();
+	result = LeapApp().run();
 	return result;
 }
