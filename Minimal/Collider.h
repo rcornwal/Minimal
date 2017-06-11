@@ -43,8 +43,11 @@ public:
 	glm::vec4 rot;
 	glm::vec3 scale;
 	glm::vec3 vel;
+	bool offset;
+	static glm::vec3 centerPos;
 	float gravityScale;
 	bool continuous;
+	bool active;
 
 	/* Functions */
 	void Update();
@@ -72,7 +75,6 @@ private:
 	type colliderType;
 	Primitive *colliderObject;
 	float curTime;
-	bool active;
 	void SetBlueDelay(float t);
 
 protected:

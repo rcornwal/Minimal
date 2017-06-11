@@ -28,11 +28,12 @@ class GameObject {
 public:
 
 	GameObject();
+	static glm::vec3 centerPos;
 	static vector<GameObject *> GameObject::objects;
 	static void RenderAll(const glm::mat4 & projection, const glm::mat4 & modelview);
 
 	/* Functions */
-	virtual void Render(glm::mat4 view, glm::mat4 proj) {}
+	virtual void Render(glm::mat4 view, glm::mat4 proj, glm::vec3 centerPos) {}
 	glm::vec3 GetPoint(glm::vec3 p);
 	glm::vec3 GetDirection(glm::vec3 d);
 	void AddCollider(Collider::type cType);

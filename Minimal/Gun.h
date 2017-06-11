@@ -8,7 +8,6 @@
 #include "Model.h"
 #include "Laser.h"
 #include "Ball.h"
-#include "Network.h"
 
 // Std includes
 #include <stdio.h>
@@ -29,9 +28,6 @@
 #include <glm/gtx/quaternion.hpp>
 #include <GL/glew.h>
 
-#include <OVR_CAPI.h>
-#include <OVR_CAPI_GL.h>
-
 struct Ray {
 	glm::vec3 origin;
 	glm::vec3 dir;
@@ -40,19 +36,19 @@ struct Ray {
 
 class Gun {
 public:
-	glm::vec3 muzzlePos;
 
+	Gun();
+
+	// Positioning
+	glm::vec3 muzzlePos;
 	glm::vec3 position;
 	glm::vec4 rotation;
 	glm::vec3 scale;
 
-	// Controlls for this controller
-	ovrInputState inputState;
-	ovrTouch btn1, btn2;
-	ovrHandType hand;
+	// Controlls for the gun
+	bool triggerSqueezed;
 
-	Gun();
-	void Render(glm::mat4 view, glm::mat4 proj);
+	void Render(glm::mat4 view, glm::mat4 proj, glm::vec3 centerPos);
 	glm::vec3 GetMuzzlePos();
 	void ShootBall();
 	glm::vec3 GetColor();
@@ -71,5 +67,4 @@ private:
 	Shader gunShader;
 
 	bool triggerPress = false;
-
 };

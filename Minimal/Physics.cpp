@@ -11,8 +11,15 @@ bool Physics::debug = false;
 const float Physics::gravity = .0002f;
 
 void Physics::AddObject(Collider* c) {
-	OutputDebugString("Added collider to physics\n");
 	objects.push_back(c);
+}
+
+void Physics::RemoveObject(Collider* c) {
+	for (int i = 0; i < objects.size(); i++) {
+		if (c == objects[i]) {
+			objects.erase(objects.begin() + i);
+		}
+	}
 }
 
 bool Contains(vector<int> v, int num) {
@@ -26,6 +33,8 @@ bool Contains(vector<int> v, int num) {
 }
 
 void Physics::Update(const glm::mat4 & projection, const glm::mat4 & modelview) {
+	OutputDebugString(to_string(objects.size()).c_str());
+	OutputDebugString("\n");
 
 	// Update recent collisions
 	for (int i = 0; i < recentCollisions.size(); i++) {
@@ -51,6 +60,10 @@ void Physics::Update(const glm::mat4 & projection, const glm::mat4 & modelview) 
 		Collider * c1 = objects[i];
 		if (c1->isStatic)
 			continue;
+		if (c1->active == false) {
+			objects.erase(objects.begin() + i);
+			continue;
+		}
 
 		if (Contains(collisionTests, i)) {
 			continue;

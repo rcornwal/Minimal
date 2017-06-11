@@ -28,9 +28,6 @@
 #include <glm/gtx/quaternion.hpp>
 #include <GL/glew.h>
 
-#include <OVR_CAPI.h>
-#include <OVR_CAPI_GL.h>
-
 class Wall : public GameObject {
 public:
 	glm::vec3 position;
@@ -39,7 +36,7 @@ public:
 	Model model;
 
 	Wall();
-	void Render(glm::mat4 view, glm::mat4 proj);
+	void Render(glm::mat4 view, glm::mat4 proj, glm::vec3 centerPos);
 
 private:
 	/* Data */

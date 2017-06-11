@@ -22,15 +22,16 @@ Beachball::Beachball() {
 	scale = glm::vec3(1.0f, 1.0f, 1.0f);
 }
 
-void Beachball::Render(glm::mat4 view, glm::mat4 proj) {
+void Beachball::Render(glm::mat4 view, glm::mat4 proj, glm::vec3 centerPos) {
 
 	position = collider->pos;
+	glm::vec3 offsetPos = position - centerPos;
 
 	shader.Use();
 
 	// Calculate the toWorld matrix for the model
 	glm::mat4 modelMat;
-	glm::mat4 T = glm::translate(glm::mat4(1.0f), position);
+	glm::mat4 T = glm::translate(glm::mat4(1.0f), offsetPos);
 	glm::mat4 S = glm::scale(glm::mat4(1.0f), scale);
 	modelMat = T * S;
 

@@ -32,7 +32,7 @@ public:
 	Shader shader;
 
 	Ball();
-	void Render(glm::mat4 view, glm::mat4 proj);
+	void Render(glm::mat4 view, glm::mat4 proj, glm::vec3 centerPos);
 
 
 protected:

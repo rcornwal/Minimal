@@ -1,0 +1,56 @@
+# Blender MTL File: 'the_genesis_production_iron_man_helmet_by_the_genesis_production.blend'
+# Material Count: 5
+
+newmtl Glass_Material
+Ns 96.078431
+Ka 0.160000 0.160000 0.160000
+Kd 0.488889 0.659259 1.000000
+Ks 0.769721 0.769721 0.769721
+Ke 0.977778 1.318518 2.000000
+Ni 1.576000
+d 0.416581
+illum 7
+
+newmtl Glass_Material_Helmet
+Ns 96.078431
+Ka 0.160000 0.160000 0.160000
+Kd 0.488889 0.659259 1.000000
+Ks 0.769721 0.769721 0.769721
+Ke 0.977778 1.318518 2.000000
+Ni 1.576000
+d 0.416581
+illum 7
+map_Kd ./Models/helmet/Helmet.ppm
+
+newmtl Head_Material
+Ns 134.615362
+Ka 1.000000 1.000000 1.000000
+Kd 1.000000 0.866667 0.600000
+Ks 0.184615 0.184615 0.184615
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd ./Models/helmet/Helmet.ppm
+
+newmtl Head_Material2
+Ns 319.607843
+Ka 0.451000 0.451000 0.451000
+Kd 1.000000 0.113637 0.000000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 5
+map_Kd ./Models/helmet/Helmet.ppm
+
+newmtl Material.002
+Ns 319.607843
+Ka 0.450592 0.450592 0.450592
+Kd 0.792566 0.729034 0.286660
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 5
+map_Kd ./Models/helmet/Helmet.ppm

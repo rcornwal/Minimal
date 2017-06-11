@@ -6,6 +6,7 @@
 
 /////////////////////////////////////////////////////
 vector<GameObject *> GameObject::objects;
+glm::vec3 GameObject::centerPos = glm::vec3(0, 0, 0);
 
 void printv(glm::vec3 v) {
 	OutputDebugString("(");
@@ -19,7 +20,13 @@ void printv(glm::vec3 v) {
 
 void GameObject::RenderAll(const glm::mat4 & modelview, const glm::mat4 & projection) {
 	for (int i = 0; i < objects.size(); i++) {
-		objects[i]->Render(modelview, projection);
+		if (objects[i]->collider != nullptr) {
+			if (objects[i]->collider->active == false) {
+				objects.erase(objects.begin() + i);
+				continue;
+			}
+		}
+		objects[i]->Render(modelview, projection, centerPos);
 	}
 }
 
@@ -95,8 +102,6 @@ void GameObject::AddCollider(Collider::type cType) {
 		glm::vec3 dir2 = p3 - p2;
 		glm::vec3 norm = glm::normalize(glm::cross(dir1, dir2));
 
-		printv(GetDirection(norm));
-
 		// bounds
 		collider->SetXBounds(min.x, max.x);
 		collider->SetZBounds(min.z, max.z);
@@ -104,7 +109,6 @@ void GameObject::AddCollider(Collider::type cType) {
 		max = GetPoint(model->GetMax());
 		min = GetPoint(model->GetMin());
 
-		printv(GetPos());
 		collider->SetPoint(GetPos());
 		collider->SetNormal(GetDirection(norm));
 
@@ -115,7 +119,6 @@ void GameObject::AddCollider(Collider::type cType) {
 void GameObject::SetRadius(float radius) {
 	collider->SetRadius(radius);
 }
-
 
 void GameObject::ApplyForce(glm::vec3 force) {
 	collider->ApplyForce(force);

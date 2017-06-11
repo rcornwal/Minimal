@@ -22,13 +22,15 @@ Floor::Floor() {
 	rotation = glm::vec4(1.0, 0, 0, 0);
 }
 
-void Floor::Render(glm::mat4 view, glm::mat4 proj) {
+void Floor::Render(glm::mat4 view, glm::mat4 proj, glm::vec3 centerPos) {
 
 	floorShader.Use();
 
+	glm::vec3 offsetPos = position - centerPos;
+
 	// Calculate the toWorld matrix for the model
 	glm::mat4 modelMat;
-	glm::mat4 T = glm::translate(glm::mat4(1.0f), position);
+	glm::mat4 T = glm::translate(glm::mat4(1.0f), offsetPos);
 	glm::mat4 R = glm::rotate(glm::mat4(1.0f), rotation.w, glm::vec3(rotation.x, rotation.y, rotation.z));
 	glm::mat4 S = glm::scale(glm::mat4(1.0f), scale);
 	modelMat = T * R * S;

@@ -5,6 +5,7 @@
 #include "Collider.h"
 
 /////////////////////////////////////////////////////
+glm::vec3 Collider::centerPos = glm::vec3(0, 0, 0);
 
 void print(glm::vec3 v) {
 	OutputDebugString("(");
@@ -57,6 +58,7 @@ Collider::Collider(Collider::type t, glm::vec3 p, glm::vec4 r, glm::vec3 s) {
 	isStatic = false;
 	gravityScale = 1.0f;
 	continuous = false;
+	offset = true;
 }
 
 void Collider::ApplyForce(glm::vec3 v) {
@@ -111,7 +113,7 @@ bool Collider::CheckForCollision(Collider * otherObject) {
 
 		// Sphere / Plane Collision
 		case Collider::PlaneType:
-			collision = CollisionTests::SpherePlane(pos, radius, otherObject->point, otherObject->normal);
+			collision = CollisionTests::SpherePlane(offset ? pos - centerPos : pos, radius, otherObject->point - centerPos, otherObject->normal);
 			if (collision == true) {
 
 				// Check if the collision was in our bounds
@@ -146,20 +148,22 @@ bool Collider::CheckForCollision(Collider * otherObject) {
 
 		// Sphere / Sphere Collision
 		case Collider::SphereType:
-			collision = CollisionTests::SphereSphere(pos, radius, otherObject->pos, otherObject->radius);
+			glm::vec3 p1 = offset ? pos - centerPos : pos;
+			glm::vec3 p2 = otherObject->offset ? otherObject->pos - centerPos : otherObject->pos;
+			collision = CollisionTests::SphereSphere(p1, radius, p2, otherObject->radius);
 			if (collision) {
 				if (otherObject->active == false)
 					otherObject->active = true;
 
 				// sphere 1
 				glm::vec3 nv1 = vel;
-				nv1 += proj(otherObject->vel, otherObject->pos - pos);
-				nv1 -= proj(vel, pos - otherObject->pos);
+				nv1 += proj(otherObject->vel, p2 - p1);
+				nv1 -= proj(vel, p1 - p2);
 
 				// sphere 2
 				glm::vec3 nv2 = otherObject->vel;
-				nv2 += proj(vel, otherObject->pos - pos);
-				nv2 -= proj(otherObject->vel, pos - otherObject->pos);
+				nv2 += proj(vel, p2 - p1);
+				nv2 -= proj(otherObject->vel, p1 - p2);
 
 				vel = nv1 * .85f;
 				Update();
@@ -183,13 +187,12 @@ void Collider::Update() {
 		return;
 
 	// visual representation
-	colliderObject->position = pos;
+	colliderObject->position = offset?pos-centerPos:pos;
 	colliderObject->rotation = rot;
 	colliderObject->modelScale = scale;
 
 	// Update collider position based off of current velocity
 	pos = glm::vec3(pos.x + vel.x, pos.y + vel.y, pos.z + vel.z);
-
 
 }
 

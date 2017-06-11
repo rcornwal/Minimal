@@ -22,9 +22,10 @@ Ball::Ball() {
 	scale = glm::vec3(1.0f, 1.0f, 1.0f);
 }
 
-void Ball::Render(glm::mat4 view, glm::mat4 proj) {
+void Ball::Render(glm::mat4 view, glm::mat4 proj, glm::vec3 centerPos) {
 
 	position = collider->pos;
+	collider->offset = false;
 
 	shader.Use();
 

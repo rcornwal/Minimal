@@ -23,9 +23,20 @@ limitations under the License.
 #include <string>
 #include <exception>
 #include <algorithm>
+#include <functional>
 #include <Windows.h>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/noise.hpp>
+#include <glm/gtx/rotate_vector.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/quaternion.hpp>
+
 #include "GameScene.h"
+#include "LeapApp.h"
 
 #define __STDC_FORMAT_MACROS 1
 
@@ -36,14 +47,7 @@ limitations under the License.
 // GLM is a C++ math library meant to mirror the syntax of GLSL 
 //
 
-#include <glm/glm.hpp>
-#include <glm/gtc/noise.hpp>
-#include <glm/gtx/rotate_vector.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtx/transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <glm/gtc/quaternion.hpp>
-#include <glm/gtx/quaternion.hpp>
+#include "rpc/client.h"
 
 // Import the most commonly used types into the default namespace
 using glm::ivec3;
@@ -721,7 +725,10 @@ protected:
 // An example application that renders a simple cube
 //////////////////////////////////////////////////////////////////////
 
+#include "rpc/client.h"
+const int player = 1;
 
+rpc::client c("localhost", 8080);
 class ExampleApp : public RiftApp {
 	std::shared_ptr<GameScene> caveScene;
 
@@ -729,6 +736,25 @@ public:
 	ExampleApp() { }
 
 protected:
+
+	glm::vec3 headPos() {
+		ovrTrackingState hmdState = GetEyePoses();
+		float x = hmdState.HeadPose.ThePose.Position.x;
+		float y = hmdState.HeadPose.ThePose.Position.y;
+		float z = hmdState.HeadPose.ThePose.Position.z;
+		glm::vec3 pos(x, y, z);
+		return pos;
+	}
+
+	glm::vec4 headOrientation() {
+		ovrTrackingState hmdState = GetEyePoses();
+		float x = hmdState.HeadPose.ThePose.Orientation.x;
+		float y = hmdState.HeadPose.ThePose.Orientation.y;
+		float z = hmdState.HeadPose.ThePose.Orientation.z;
+		float w = hmdState.HeadPose.ThePose.Orientation.w;
+		glm::vec4 rot(x, y, z, w);
+		return rot;
+	}
 
 	glm::vec3 leftControllerPos() {
 		ovrTrackingState hmdState = GetEyePoses();
@@ -768,6 +794,15 @@ protected:
 		return rot;
 	}
 
+	bool triggerSqueezed() {
+		ovrInputState inputState;
+		ovr_GetInputState(_session, ovrControllerType_Touch, &inputState);
+		if (inputState.IndexTrigger[ovrHand_Right] > .5f) {
+			return true;
+		}
+		return false;
+	}
+
 	void initGl() override {
 		RiftApp::initGl();
 		glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
@@ -781,43 +816,107 @@ protected:
 		caveScene.reset();
 	}
 
+	void GetServerInformation() {
+		
+		if (player == 1) {
+			caveScene->player2Data.headPos = glm::vec3(c.call("GetHeadPos_P2.x").as<float>(), c.call("GetHeadPos_P2.y").as<float>(), c.call("GetHeadPos_P2.z").as<float>());
+			caveScene->player2Data.headOrientation = glm::vec4(c.call("GetHeadOrientation_P2.x").as<float>(), c.call("GetHeadOrientation_P2.y").as<float>(), c.call("GetHeadOrientation_P2.z").as<float>(), c.call("GetHeadOrientation_P2.w").as<float>());
+			caveScene->player2Data.leftHandPos = glm::vec3(c.call("GetLeftHandPos_P2.x").as<float>(), c.call("GetLeftHandPos_P2.y").as<float>(), c.call("GetLeftHandPos_P2.z").as<float>());
+			caveScene->player2Data.leftHandOrientation = glm::vec4(c.call("GetLeftHandOrientation_P2.x").as<float>(), c.call("GetLeftHandOrientation_P2.y").as<float>(), c.call("GetLeftHandOrientation_P2.z").as<float>(), c.call("GetLeftHandOrientation_P2.w").as<float>());
+			caveScene->player2Data.rightHandPos = glm::vec3(c.call("GetRightHandPos_P2.x").as<float>(), c.call("GetRightHandPos_P2.y").as<float>(), c.call("GetRightHandPos_P2.z").as<float>());
+			caveScene->player2Data.rightHandOrientation = glm::vec4(c.call("GetRightHandOrientation_P2.x").as<float>(), c.call("GetRightHandOrientation_P2.y").as<float>(), c.call("GetRightHandOrientation_P2.z").as<float>(), c.call("GetRightHandOrientation_P2.w").as<float>());
+			caveScene->player2Data.triggerSqueezed = c.call("GetTriggerSqueezed_P2").as<bool>();
+		}
+		else if (player == 2) {
+	
+			caveScene->player2Data.headPos = glm::vec3(c.call("GetHeadPos_P1.x").as<float>(), c.call("GetHeadPos_P1.y").as<float>(), c.call("GetHeadPos_P1.z").as<float>());
+			caveScene->player2Data.headOrientation = glm::vec4(c.call("GetHeadOrientation_P1.x").as<float>(), c.call("GetHeadOrientation_P1.y").as<float>(), c.call("GetHeadOrientation_P1.z").as<float>(), c.call("GetHeadOrientation_P1.w").as<float>());
+			caveScene->player2Data.leftHandPos = glm::vec3(c.call("GetLeftHandPos_P1.x").as<float>(), c.call("GetLeftHandPos_P1.y").as<float>(), c.call("GetLeftHandPos_P1.z").as<float>());
+			caveScene->player2Data.leftHandOrientation = glm::vec4(c.call("GetLeftHandOrientation_P1.x").as<float>(), c.call("GetLeftHandOrientation_P1.y").as<float>(), c.call("GetLeftHandOrientation_P1.z").as<float>(), c.call("GetLeftHandOrientation_P1.w").as<float>());
+			caveScene->player2Data.rightHandPos = glm::vec3(c.call("GetRightHandPos_P1.x").as<float>(), c.call("GetRightHandPos_P1.y").as<float>(), c.call("GetRightHandPos_P1.z").as<float>());
+			caveScene->player2Data.rightHandOrientation = glm::vec4(c.call("GetRightHandOrientation_P1.x").as<float>(), c.call("GetRightHandOrientation_P1.y").as<float>(), c.call("GetRightHandOrientation_P1.z").as<float>(), c.call("GetRightHandOrientation_P1.w").as<float>());
+			caveScene->player2Data.triggerSqueezed = c.call("GetTriggerSqueezed_P1").as<bool>();
+		}
+	}
+
+	void SaveServerInformation() {
+
+		if (player == 1) {
+			c.call("SetHeadPos_P1.x", caveScene->player1Data.headPos.x); c.call("SetHeadPos_P1.y", caveScene->player1Data.headPos.y); c.call("SetHeadPos_P1.z", caveScene->player1Data.headPos.z);
+			c.call("SetHeadOrientation_P1.x", caveScene->player1Data.headOrientation.x); c.call("SetHeadOrientation_P1.y", caveScene->player1Data.headOrientation.y); c.call("SetHeadOrientation_P1.z", caveScene->player1Data.headOrientation.z); c.call("SetHeadOrientation_P1.w", caveScene->player1Data.headOrientation.w);
+			c.call("SetLeftHandPos_P1.x", caveScene->player1Data.leftHandPos.x); c.call("SetLeftHandPos_P1.y", caveScene->player1Data.leftHandPos.y); c.call("SetLeftHandPos_P1.z", caveScene->player1Data.leftHandPos.z);
+			c.call("SetLeftHandOrientation_P1.x", caveScene->player1Data.leftHandOrientation.x); c.call("SetLeftHandOrientation_P1.y", caveScene->player1Data.leftHandOrientation.y); c.call("SetLeftHandOrientation_P1.z", caveScene->player1Data.leftHandOrientation.z); c.call("SetLeftHandOrientation_P1.w", caveScene->player1Data.leftHandOrientation.w);
+			c.call("SetRightHandPos_P1.x", caveScene->player1Data.rightHandPos.x); c.call("SetRightHandPos_P1.y", caveScene->player1Data.rightHandPos.y); c.call("SetRightHandPos_P1.z", caveScene->player1Data.rightHandPos.z);
+			c.call("SetRightHandOrientation_P1.x", caveScene->player1Data.rightHandOrientation.x); c.call("SetRightHandOrientation_P1.y", caveScene->player1Data.rightHandOrientation.y); c.call("SetRightHandOrientation_P1.z", caveScene->player1Data.rightHandOrientation.z); c.call("SetRightHandOrientation_P1.w", caveScene->player1Data.rightHandOrientation.w);
+			c.call("SetTriggerSqueezed_P1", caveScene->player1Data.triggerSqueezed);
+		}
+
+		else if (player == 2) {
+
+			c.call("SetHeadPos_P2.x", caveScene->player1Data.headPos.x); c.call("SetHeadPos_P2.y", caveScene->player1Data.headPos.y); c.call("SetHeadPos_P2.z", caveScene->player1Data.headPos.z);
+			c.call("SetHeadOrientation_P2.x", caveScene->player1Data.headOrientation.x); c.call("SetHeadOrientation_P2.y", caveScene->player1Data.headOrientation.y); c.call("SetHeadOrientation_P2.z", caveScene->player1Data.headOrientation.z); c.call("SetHeadOrientation_P2.w", caveScene->player1Data.headOrientation.w);
+			c.call("SetLeftHandPos_P2.x", caveScene->player1Data.leftHandPos.x); c.call("SetLeftHandPos_P2.y", caveScene->player1Data.leftHandPos.y); c.call("SetLeftHandPos_P2.z", caveScene->player1Data.leftHandPos.z);
+			c.call("SetLeftHandOrientation_P2.x", caveScene->player1Data.leftHandOrientation.x); c.call("SetLeftHandOrientation_P2.y", caveScene->player1Data.leftHandOrientation.y); c.call("SetLeftHandOrientation_P2.z", caveScene->player1Data.leftHandOrientation.z); c.call("SetLeftHandOrientation_P2.w", caveScene->player1Data.leftHandOrientation.w);
+			c.call("SetRightHandPos_P2.x", caveScene->player1Data.rightHandPos.x); c.call("SetRightHandPos_P2.y", caveScene->player1Data.rightHandPos.y); c.call("SetRightHandPos_P2.z", caveScene->player1Data.rightHandPos.z);
+			c.call("SetRightHandOrientation_P2.x", caveScene->player1Data.rightHandOrientation.x); c.call("SetRightHandOrientation_P2.y", caveScene->player1Data.rightHandOrientation.y); c.call("SetRightHandOrientation_P2.z", caveScene->player1Data.rightHandOrientation.z); c.call("SetRightHandOrientation_P2.w", caveScene->player1Data.rightHandOrientation.w);
+			c.call("SetTriggerSqueezed_P2", caveScene->player1Data.triggerSqueezed);
+		}
+	}
+
+	void print(glm::vec3 v) {
+		OutputDebugString("(");
+		OutputDebugString(to_string(v.x).c_str());
+		OutputDebugString(", ");
+		OutputDebugString(to_string(v.y).c_str());
+		OutputDebugString(", ");
+		OutputDebugString(to_string(v.z).c_str());
+		OutputDebugString(")\n");
+	}
+
 	void renderScene(const glm::mat4 & projection, const glm::mat4 & headPose, glm::vec4 viewport, const int eyeNum) override {
 		
 		ovrInputState inputState;
 		ovr_GetInputState(_session, ovrControllerType_Touch, &inputState);
 
 		// pass in info about the hmd to our scene
-		caveScene->hmdData.leftControllerPos = leftControllerPos();
-		caveScene->hmdData.rightControllerPos = rightControllerPos();
-		caveScene->hmdData.leftControllerOrientation = leftControllerOrientation();
-		caveScene->hmdData.rightControllerOrientation = rightControllerOrientation();
-		caveScene->hmdData.inputState = inputState;
+		caveScene->player1Data.headPos = headPos();
+		caveScene->player1Data.headOrientation = headOrientation();
+		caveScene->player1Data.leftHandPos = leftControllerPos();
+		caveScene->player1Data.rightHandPos = rightControllerPos();
+		caveScene->player1Data.leftHandOrientation = leftControllerOrientation();
+		caveScene->player1Data.rightHandOrientation = rightControllerOrientation();
+		caveScene->player1Data.triggerSqueezed = triggerSqueezed();
+
+		// get the information about the other player from the server
+		GetServerInformation();
 
 		// render the scene
-		caveScene->render(projection, glm::inverse(headPose));
+		caveScene->render(projection, glm::inverse(headPose), player);
+
+		// set the updated values back to the server
+		SaveServerInformation();
+
 	}
 
 };
 
-// Execute our example class
-#include "rpc/server.h"
 
 int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
 	int result = -1;
+	
+	LeapApp().run();
 
-	//rpc::server srv(8080);
-
-	try {
-		if (!OVR_SUCCESS(ovr_Initialize(nullptr))) {
-			FAIL("Failed to initialize the Oculus SDK");
-		}
-		
-		result = ExampleApp().run();
-	}
-	catch (std::exception & error) {
-		OutputDebugStringA(error.what());
-		std::cerr << error.what() << std::endl;
-	}
-	ovr_Shutdown();
+	//try {
+	//	if (!OVR_SUCCESS(ovr_Initialize(nullptr))) {
+	//		FAIL("Failed to initialize the Oculus SDK");
+	//	}
+	//	
+	//	result = ExampleApp().run();
+	//}
+	//catch (std::exception & error) {
+	//	OutputDebugStringA(error.what());
+	//	std::cerr << error.what() << std::endl;
+	//}
+	//ovr_Shutdown();
 	return result;
 }

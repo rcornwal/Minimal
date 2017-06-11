@@ -25,8 +25,6 @@
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
 #include <GL/glew.h>
-#include <OVR_CAPI.h>
-#include <OVR_CAPI_GL.h>
 
 class Primitive {
 public:

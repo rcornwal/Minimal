@@ -32,7 +32,7 @@ public:
 
 	/* Functions */
 	static void AddObject(Collider* c);
-	static void RemoveObject(Collider c) {}
+	static void RemoveObject(Collider* c);
 	static void Update(const glm::mat4 & projection, const glm::mat4 & modelview);
 
 private:
