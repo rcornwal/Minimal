@@ -918,5 +918,6 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 	//	std::cerr << error.what() << std::endl;
 	//}
 	//ovr_Shutdown();
+
 	return result;
 }

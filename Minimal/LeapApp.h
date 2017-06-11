@@ -14,10 +14,7 @@
 #include <glm/gtx/quaternion.hpp>
 
 #include "GameScene.h"
-
-
-// Properties
-const GLuint screenWidth = 800, screenHeight = 600;
+#include "AnaglyphCam.h"
 
 struct LeapData {
 	glm::vec3 leftHandPos;
@@ -27,27 +24,12 @@ struct LeapData {
 	bool triggerSqueezed;
 };
 
-class StereoCam {
-
-public:
-
-	StereoCam();
-
-
-
-	float EyeSeparation;
-	float AspectRatio;
-	float FOV;
-	float Convergence;
-	float NearClip;
-	float FarClip;
-};
-
 class LeapApp {
 public:
 	LeapApp();
 	int run();
 	void ProcessFrame(LeapData * leap_data);
+	static void key_callback(GLFWwindow * window, int key, int scancode, int action, int mode);
 
 	Leap::Controller controller;
 	glm::vec4 toQuaternion(float yaw, float pitch, float roll);
@@ -55,4 +37,7 @@ public:
 	glm::vec3 camera_front;
 	GLfloat deltaTime;
 	GLfloat lastFrame;
+
+	int screenWidth;
+	int screenHeight;
 };

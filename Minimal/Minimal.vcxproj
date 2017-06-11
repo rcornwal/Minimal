@@ -134,6 +134,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AnaglyphCam.cpp" />
     <ClCompile Include="Ball.cpp" />
     <ClCompile Include="Beachball.cpp" />
     <ClCompile Include="CaveDebugLine.cpp" />
@@ -164,6 +165,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AnaglyphCam.h" />
     <ClInclude Include="Ball.h" />
     <ClInclude Include="Beachball.h" />
     <ClInclude Include="CaveDebugLine.h" />
