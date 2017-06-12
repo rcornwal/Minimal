@@ -7,8 +7,8 @@ LeapApp::LeapApp() {
 	camera_front = glm::vec3(0, 0, -1);
 	controller = Leap::Controller();
 
-	screenWidth = 1920;
-	screenHeight = 1200;
+	screenWidth = 800;
+	screenHeight = 600;
 };
 
 int LeapApp::run()
@@ -22,7 +22,7 @@ int LeapApp::run()
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwWindowHint(GLFW_SAMPLES, 4);
 
-	GLFWwindow* window = glfwCreateWindow(screenWidth, screenHeight, "Beach Battle Balls - Player 2", glfwGetPrimaryMonitor(), nullptr);
+	GLFWwindow* window = glfwCreateWindow(screenWidth, screenHeight, "Beach Battle Balls - Player 2", nullptr, nullptr);
 	glfwMakeContextCurrent(window);
 
 	glfwSetKeyCallback(window, key_callback);
