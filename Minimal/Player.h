@@ -7,6 +7,7 @@
 #include "Gun.h"
 #include "Head.h"
 #include "Shield.h"
+#include "irrklang.h"
 
 // Std includes
 #include <stdio.h>

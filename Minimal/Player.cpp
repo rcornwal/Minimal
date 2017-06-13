@@ -5,7 +5,7 @@
 #include "Player.h"
 
 /////////////////////////////////////////////////////
-
+extern irrklang::ISoundEngine * SoundEngine;
 Player::Player() {
 	mainPlayer = false;
 
@@ -43,6 +43,7 @@ void Player::Render(glm::mat4 view, glm::mat4 proj, glm::vec3 centerPos) {
 		hitEffect->position = offsetPos + data.headPos;
 		hitEffect->scale = glm::vec3(.05f, .05f, .05f);
 		hitEffect->Render(view, proj, centerPos);
+		SoundEngine->play2D("./audio/hit.wav", GL_FALSE);
 	}
 
 	// Controlls for the right controller

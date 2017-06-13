@@ -8,6 +8,7 @@
 #include "Model.h"
 #include "Laser.h"
 #include "Ball.h"
+#include "irrKlang.h"
 
 // Std includes
 #include <stdio.h>

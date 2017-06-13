@@ -3,6 +3,7 @@
 /////////////////////
 
 #include "Gun.h"
+extern irrklang::ISoundEngine * SoundEngine;
 
 /////////////////////////////////////////////////////
 Gun::Gun(){
@@ -46,6 +47,8 @@ glm::vec3 Gun::GetMuzzlePos() {
 }
 
 void Gun::ShootBall() {
+
+	SoundEngine->play2D("./audio/laser.wav", GL_FALSE);
 
 	if (balls.size() > MAX_BALLS) {
 		Ball * ball = balls.front();

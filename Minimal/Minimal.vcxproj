@@ -91,15 +91,17 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)\Include\LibOVR;$(MSBuildThisFileDirectory)include;$(SolutionDir)\Include\rpclib\include;$(SolutionDir)\Include\rpclib\dependencies\include\rpc;$(SolutionDir)\LeapSDK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Include\irrklang;$(SolutionDir)\Include\LibOVR;$(MSBuildThisFileDirectory)include;$(SolutionDir)\Include\rpclib\include;$(SolutionDir)\Include\rpclib\dependencies\include\rpc;$(SolutionDir)\LeapSDK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>rpc.lib;LibOVR.lib;opengl32.lib;glu32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;Leap.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>irrklang.lib;rpc.lib;LibOVR.lib;opengl32.lib;glu32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;Leap.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)\Include\rpclib\build\output\lib\Release;$(SolutionDir)\lib;$(SolutionDir)\LeapSDK\lib\x64</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /yr "$(SolutionDir)\LeapSDK\lib\x64\Leap.lib" "$(TargetDir)"</Command>
+      <Command>xcopy /yr "$(SolutionDir)\LeapSDK\lib\x64\Leap.dll" "$(TargetDir)"
+xcopy /yr "$(SolutionDir)\lib\irrklang.dll" "$(TargetDir)"
+xcopy /yr "$(SolutionDir)\lib\ikpMP3.dll" "$(TargetDir)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -174,6 +176,7 @@
     <ClCompile Include="WinBanner.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="ClassDiagram.cd" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

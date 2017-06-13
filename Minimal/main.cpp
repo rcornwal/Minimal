@@ -913,6 +913,9 @@ protected:
 
 };
 
+#include "irrKlang.h"
+using namespace irrklang;
+ISoundEngine *SoundEngine = createIrrKlangDevice();
 
 int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
 	int result = -1;
@@ -926,6 +929,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 				FAIL("Failed to initialize the Oculus SDK");
 			}
 
+			SoundEngine->play2D("./audio/spearofjustice.mp3", GL_TRUE);
 			result = ExampleApp().run();
 		}
 		catch (std::exception & error) {
@@ -937,5 +941,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 	else {
 		result = LeapApp(player).run();
 	}
+
+	SoundEngine->drop();
 	return result;
 }
