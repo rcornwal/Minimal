@@ -26,12 +26,32 @@
 #include <OVR_CAPI.h>
 #include <OVR_CAPI_GL.h>
 
+static struct plane {
+	glm::vec3 pos;
+	glm::vec3 norm;
+};
+
+static struct sphere {
+	glm::vec3 center;
+	float radius;
+};
+
 static class CollisionTests {
 public:
 
 	// Functions
 	static bool SpherePlane(glm::vec3 sphere_pos, float sphere_rad, glm::vec3 plane_pos, glm::vec3 plane_norm) {
 		
+		sphere s;
+		s.center = sphere_pos;
+		s.radius = sphere_rad;
+
+		plane p;
+		p.pos = plane_pos;
+		p.norm = glm::normalize(plane_norm);
+
+		return sphere_inside_plane(s, p);
+
 		glm::vec3 pNorm = glm::normalize(plane_norm);
 		float D = glm::dot((sphere_pos - plane_pos), pNorm);
 		if (D < sphere_rad) {
@@ -48,6 +68,20 @@ public:
 		return false;
 	}
 
-protected:
+private:
+	static float plane_distance(plane p, glm::vec3 point) {
+		return glm::dot((point - p.pos), p.norm);
+	}
 
+	static bool sphere_inside_plane(sphere s, plane p) {
+		return plane_distance(p, s.center) < s.radius;
+	}
+
+	static bool sphere_outside_plane(sphere s, plane p) {
+		return plane_distance(p, s.center) > s.radius;
+	}
+
+	static bool sphere_intersects_plane(sphere s, plane p) {
+		return fabs(plane_distance(p, s.center)) <= s.radius;
+	}
 };

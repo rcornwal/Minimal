@@ -7,15 +7,14 @@
 
 /////////////////////////////////////////////////////
 
-Skybox::Skybox(bool left, GLfloat dist) {
+Skybox::Skybox() {
 
 	// Create the shader to use for the controller
 	Shader cubeS(vertexShaderPath, fragShaderPath);
 	skyboxShader = cubeS;
-	if (left) dist = -dist;
 
 	// Sets the position / rotation / scale
-	position = glm::vec3(dist, 0.0f, 0.0f);
+	position = glm::vec3(0.0f, 0.0f, 0.0f);
 	rotation = glm::vec4(0, 0, 0, 0);
 	scale = glm::vec3(20, 20, 20);
 
@@ -98,14 +97,12 @@ Skybox::Skybox(bool left, GLfloat dist) {
 	GLchar* texturePathPY;
 	GLchar* texturePathPZ;
 
-
-		texturePathNX = "./Models/skybox/right-ppm/pz.ppm";
-		texturePathNY = "./Models/skybox/right-ppm/pz.ppm";
-		texturePathNZ = "./Models/skybox/right-ppm/pz.ppm";
-		texturePathPX = "./Models/skybox/right-ppm/pz.ppm";
-		texturePathPY = "./Models/skybox/right-ppm/pz.ppm";
-		texturePathPZ = "./Models/skybox/right-ppm/pz.ppm";
-
+	texturePathNX = "./Models/skybox/sea_skybox/nx.ppm";
+	texturePathNY = "./Models/skybox/sea_skybox/ny.ppm";
+	texturePathNZ = "./Models/skybox/sea_skybox/nz.ppm";
+	texturePathPX = "./Models/skybox/sea_skybox/px.ppm";
+	texturePathPY = "./Models/skybox/sea_skybox/py.ppm";
+	texturePathPZ = "./Models/skybox/sea_skybox/pz.ppm";
 
 	vector<const GLchar*> faces;
 	faces.push_back(texturePathPX);

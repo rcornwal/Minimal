@@ -59,6 +59,7 @@ private:
 	Environment env;
 	int gameState = 0;
 	GLboolean l_thumb_down = false;
+	Skybox skybox;
 
 public:
 
@@ -76,7 +77,7 @@ public:
 
 
 	GameScene() {
-		
+
 	}
 
 	void resetGame() {
@@ -84,43 +85,7 @@ public:
 	}
 
 	void render(const mat4 & projection, const mat4 & modelview, int player) {
-	
-		// Controlls for the left controller
-		/*
-		leftController.inputState = hmdData.inputState;
-		leftController.btn1 = ovrTouch_X;
-		leftController.btn2 = ovrTouch_Y;
-		leftController.hand = ovrHand_Left;
 
-		leftController.position = hmdData.leftControllerPos;
-		leftController.rotation = hmdData.leftControllerOrientation;
-		leftController.Render(modelview, projection);
-		*/
-
-		// Reset the game
-		/*
-		if (gameState != 0 && hmdData.inputState.Buttons & ovrTouch_A) {
-		resetGame();
-		}
-
-		// Get the left stick
-		if (hmdData.inputState.Thumbstick[ovrHand_Left].x > 0) {
-		texCube.ScaleDown();
-		}
-		else if (hmdData.inputState.Thumbstick[ovrHand_Left].x < 0) {
-		texCube.ScaleUp();
-		}
-
-		// Resets scale on left thumb press
-		if (hmdData.inputState.Buttons & ovrButton_LThumb && !l_thumb_down) {
-		texCube.ResetScale();
-		l_thumb_down = true;
-		}
-		else if (!hmdData.inputState.Buttons && l_thumb_down) {
-		l_thumb_down = false;
-		}
-		*/
-		
 		Physics::debug = false;
 		Physics::Update(modelview, projection);
 
@@ -132,7 +97,9 @@ public:
 		player1.data.rightHandOrientation = player1Data.rightHandOrientation;
 		player1.data.rightHandPos = player1Data.rightHandPos;
 		player1.data.triggerSqueezed = player1Data.triggerSqueezed;
-		if (player == 2) {
+		player1.playerNumber = player;
+		if (player == 1) {
+		}else if (player == 2) {
 			player1.position = (glm::vec3(2.0f, 0, 0));
 		}
 
@@ -145,14 +112,16 @@ public:
 		player2.data.triggerSqueezed = player2Data.triggerSqueezed;
 		if (player == 1) {
 			player2.position = glm::vec3(2.0f, 0, 0);
+			player2.playerNumber = 2;
 		}
 		else {
+			player2.playerNumber = 1;
 			player2.position = glm::vec3(-2.0f, 0, 0);
 		}
 
 		player1.SetPerspectiveFromPlayer();
+		skybox.Render(modelview, projection);
 
-		
 		// Render our environment (floor, walls, etc)
 		GameObject::RenderAll(modelview, projection);
 

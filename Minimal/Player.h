@@ -6,6 +6,7 @@
 #include <Windows.h>
 #include "Gun.h"
 #include "Head.h"
+#include "Shield.h"
 
 // Std includes
 #include <stdio.h>
@@ -40,6 +41,7 @@ public:
 	} data;
 
 	Player();
+	int playerNumber;
 	void Render(glm::mat4 view, glm::mat4 proj, glm::vec3 centerPos);
 	void SetPerspectiveFromPlayer();
 	glm::vec3 position;
@@ -49,5 +51,10 @@ private:
 	/* Data */
 	Gun gun;
 	Head head;
+	Shield shield;
 	bool mainPlayer;
+
+	Ball * hitEffect;
+	Model hitEffectModel;
+	GLchar * pathToHitEffect = "./Models/ball_red/ball_red.obj";
 };

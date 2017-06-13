@@ -32,14 +32,19 @@
 #include "Floor.h"
 #include "Wall.h"
 #include "Beachball.h"
+#include "Fence.h"
 
 class Environment {
 public:
 	Floor floor;
 	Wall front;
+	Fence frontFence;
 	Wall back;
+	Fence backFence;
 	Wall left;
+	Fence leftFence;
 	Wall right;
+	Fence rightFence;
 	Beachball beachball;
 
 	// Place and scale all of our objects
@@ -53,26 +58,44 @@ public:
 		front.scale = glm::vec3(1.0f, 1.0f, 1.0f);
 		front.rotation = glm::vec4(1.0, 0, 0, 1.5708);
 		front.AddCollider(Collider::PlaneType);
+		front.ManualRender(true);
 		front.IsStatic(true);
+
+		frontFence.position = glm::vec3(0.0f, -1.5f, -4.0f);
+		frontFence.scale = glm::vec3(1.0f, 1.0f, 1.0f);
 		
 		back.position = glm::vec3(0.0f, -1.5f, 4.0f);
 		back.scale = glm::vec3(1.0f, 1.0f, 1.0f);
 		back.rotation = glm::vec4(1.0, 0, 0, -1.5708);
 		back.AddCollider(Collider::PlaneType);
+		back.ManualRender(true);
 		back.IsStatic(true);
-		
+
+		backFence.position = glm::vec3(0.0f, -1.5f, 4.0f);
+		backFence.scale = glm::vec3(1.0f, 1.0f, 1.0f);
+
 		left.position = glm::vec3(-4.0f, -1.5f, 0.0f);
 		left.scale = glm::vec3(1.0f, 1.0f, 1.0f);
 		left.rotation = glm::vec4(0, 0, 1.0, -1.5708);
 		left.AddCollider(Collider::PlaneType);
+		left.ManualRender(true);
 		left.IsStatic(true);
+
+		leftFence.position = glm::vec3(-4.0f, -1.5f, 0.0f);
+		leftFence.scale = glm::vec3(1.0f, 1.0f, 1.0f);
+		leftFence.rotation = glm::vec4(0, 1.0f, 0, 1.5708);
 		
 		right.position = glm::vec3(4.0f, -1.5f, 0.0f);
 		right.scale = glm::vec3(1.0f, 1.0f, 1.0f);
 		right.rotation = glm::vec4(0, 0, 1.0, 1.5708);
 		right.AddCollider(Collider::PlaneType);
+		right.ManualRender(true);
 		right.IsStatic(true);
 		
+		rightFence.position = glm::vec3(4.0f, -1.5f, 0.0f);
+		rightFence.scale = glm::vec3(1.0f, 1.0f, 1.0f);
+		rightFence.rotation = glm::vec4(0, 1.0f, 0, -1.5708);
+
 		beachball.position = glm::vec3(0, 0, -1.0);
 		beachball.scale = glm::vec3(.25f, .25f, .25f);
 		beachball.AddCollider(Collider::SphereType);

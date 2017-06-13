@@ -152,6 +152,7 @@
     <ClCompile Include="Collider.cpp" />
     <ClCompile Include="Controller.cpp" />
     <ClCompile Include="Factory.cpp" />
+    <ClCompile Include="Fence.cpp" />
     <ClCompile Include="Floor.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GameScene.cpp" />
@@ -165,10 +166,12 @@
     <ClCompile Include="Physics.cpp" />
     <ClCompile Include="Plane.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="Shield.cpp" />
     <ClCompile Include="Skybox.cpp" />
     <ClCompile Include="Sphere.cpp" />
     <ClCompile Include="TexCube.cpp" />
     <ClCompile Include="Wall.cpp" />
+    <ClCompile Include="WinBanner.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -185,6 +188,7 @@
     <ClInclude Include="Controller.h" />
     <ClInclude Include="Environment.h" />
     <ClInclude Include="Factory.h" />
+    <ClInclude Include="Fence.h" />
     <ClInclude Include="Floor.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GameScene.h" />
@@ -195,6 +199,7 @@
     <ClInclude Include="Plane.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Primitive.h" />
+    <ClInclude Include="Shield.h" />
     <ClInclude Include="Skybox.h" />
     <ClInclude Include="Laser.h" />
     <ClInclude Include="Mesh.h" />
@@ -204,6 +209,7 @@
     <ClInclude Include="StereoScene.h" />
     <ClInclude Include="TexCube.h" />
     <ClInclude Include="Wall.h" />
+    <ClInclude Include="WinBanner.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

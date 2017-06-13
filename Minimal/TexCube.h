@@ -55,7 +55,7 @@ private:
 
 	GLchar* vertexShaderPath = "./Models/texcube/texcube.vs";
 	GLchar* fragShaderPath   = "./Models/texcube/texcube.frag";
-	GLchar* texturePath = "./Models/texcube/pattern.ppm";
+	GLchar* texturePath = "./Models/winbanner/oculus.ppm";
 	Shader texCubeShader;
 	GLuint VAO, VBO, EBO;
 	GLint cubeTexture;

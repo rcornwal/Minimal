@@ -15,6 +15,7 @@
 
 #include "GameScene.h"
 #include "AnaglyphCam.h"
+#include "rpc/client.h"
 
 struct LeapData {
 	glm::vec3 leftHandPos;
@@ -26,10 +27,12 @@ struct LeapData {
 
 class LeapApp {
 public:
-	LeapApp();
+	LeapApp(int player);
 	int run();
 	void ProcessFrame(LeapData * leap_data);
 	static void key_callback(GLFWwindow * window, int key, int scancode, int action, int mode);
+	void SaveServerInformation();
+	void GetServerInformation();
 
 	Leap::Controller controller;
 	glm::vec4 toQuaternion(float yaw, float pitch, float roll);
@@ -37,6 +40,10 @@ public:
 	glm::vec3 camera_front;
 	GLfloat deltaTime;
 	GLfloat lastFrame;
+
+	int player;
+	//Create scene to render 
+	std::shared_ptr<GameScene> caveScene;
 
 	int screenWidth;
 	int screenHeight;

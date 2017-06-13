@@ -5,8 +5,7 @@
 #include "Gun.h"
 
 /////////////////////////////////////////////////////
-
-Gun::Gun() {
+Gun::Gun(){
 
 	// Create the shader to use for the controller
 	Shader conS(vertexShaderPath, fragShaderPath);
@@ -21,6 +20,10 @@ Gun::Gun() {
 	muzzlePos = glm::vec3(0, 1.3f, 3.3f);
 	triggerSqueezed = false;
 
+	Model redBall(pathToBulletModel_Red);
+	Model blueBall(pathToBulletModel_Blue);
+	redBallModel = redBall;
+	blueBallModel = blueBall;
 }
 
 glm::vec3 Gun::GetColor() {
@@ -43,10 +46,19 @@ glm::vec3 Gun::GetMuzzlePos() {
 }
 
 void Gun::ShootBall() {
+
+	if (balls.size() > MAX_BALLS) {
+		Ball * ball = balls.front();
+		ball->collider->active = false;
+		balls.pop_front();
+	}
 	
 	// Create our ball and shoot it
 	float shootForce = 0.04f;
-	Ball* b = new Ball();
+
+	Ball* b = new Ball( (shootRedBalls == true) ? redBallModel : blueBallModel, shootRedBalls);
+	balls.push_back(b);
+
 	b->position = GetMuzzlePos();
 	b->scale = glm::vec3(.03f, .03f, .03f);
 	b->AddCollider(Collider::SphereType);

@@ -20,6 +20,9 @@ void printv(glm::vec3 v) {
 
 void GameObject::RenderAll(const glm::mat4 & modelview, const glm::mat4 & projection) {
 	for (int i = 0; i < objects.size(); i++) {
+		if (objects[i]->overrideRender == true) {
+			continue;
+		}
 		if (objects[i]->collider != nullptr) {
 			if (objects[i]->collider->active == false) {
 				objects.erase(objects.begin() + i);
@@ -28,6 +31,10 @@ void GameObject::RenderAll(const glm::mat4 & modelview, const glm::mat4 & projec
 		}
 		objects[i]->Render(modelview, projection, centerPos);
 	}
+}
+
+void GameObject::ManualRender(bool m) {
+	overrideRender = m;
 }
 
 GameObject::GameObject() {

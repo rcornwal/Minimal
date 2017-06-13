@@ -34,8 +34,19 @@ void Collider::SetBlueDelay(float t) {
 	}
 }
 
+void Collider::SetColorDelay(Collider* otherObject) {
+	if (otherObject->curCTime > 25.0f) {
+		otherObject->curCTime = 0.0f;
+		otherObject->destroyedBall = false;
+	}
+	else {
+		otherObject->curCTime++;
+	}
+}
+
 Collider::Collider() {
 	curTime = 0.0f;
+	curCTime = 0.0f;
 }
 
 Collider::Collider(Collider::type t, glm::vec3 p, glm::vec4 r, glm::vec3 s) {
@@ -117,7 +128,7 @@ bool Collider::CheckForCollision(Collider * otherObject) {
 			if (collision == true) {
 
 				// Check if the collision was in our bounds
-				//TODO
+				
 
 				glm::vec3 u = otherObject->normal * (glm::dot(vel, otherObject->normal));
 				glm::vec3 w = vel - u;
@@ -130,7 +141,7 @@ bool Collider::CheckForCollision(Collider * otherObject) {
 				
 				// Deactive the object if its not moving enough (optimization)
 				if (continuous == false) {
-					float minVel = .004f;
+					float minVel = .009f;
 					glm::vec3 absVel = glm::vec3(fabs(newVel.x), fabs(newVel.y), fabs(newVel.z));
 					if (absVel.x < minVel && absVel.y < minVel && absVel.z < minVel) {
 						vel = glm::vec3(vel.x, 0, vel.z);
@@ -151,9 +162,21 @@ bool Collider::CheckForCollision(Collider * otherObject) {
 			glm::vec3 p1 = offset ? pos - centerPos : pos;
 			glm::vec3 p2 = otherObject->offset ? otherObject->pos - centerPos : otherObject->pos;
 			collision = CollisionTests::SphereSphere(p1, radius, p2, otherObject->radius);
+
+			if (otherObject->destroyedBall == true) {
+				SetColorDelay(otherObject);
+			}
+
 			if (collision) {
 				if (otherObject->active == false)
 					otherObject->active = true;
+
+				// Collide with hotspot
+				if (otherObject->isStatic == true) {
+					vel = glm::vec3(0, 0, 0);
+					active = false;
+					otherObject->destroyedBall = true;
+				}
 
 				// sphere 1
 				glm::vec3 nv1 = vel;

@@ -726,12 +726,12 @@ protected:
 //////////////////////////////////////////////////////////////////////
 
 #include "rpc/client.h"
-const int player = 1;
+#include "WinBanner.h"
+int player = 2;
 
 rpc::client c("localhost", 8080);
 class ExampleApp : public RiftApp {
 	std::shared_ptr<GameScene> caveScene;
-
 public:
 	ExampleApp() { }
 
@@ -813,6 +813,7 @@ protected:
 	}
 
 	void shutdownGl() override {
+		c.call("RemovePlayer");
 		caveScene.reset();
 	}
 
@@ -879,8 +880,16 @@ protected:
 		ovr_GetInputState(_session, ovrControllerType_Touch, &inputState);
 
 		// pass in info about the hmd to our scene
+
+		glm::vec4 headinfo = headOrientation();
+		glm::quat qh = glm::quat(headinfo.w, headinfo.x, headinfo.y, headinfo.z);
+		glm::quat q = qh * glm::angleAxis(1.5708f, glm::vec3(1.0f, 0.0f, 0.0f));
+		q = q * glm::angleAxis(1.5708f, glm::vec3(0.0f, 1.0f, 0.0f));
+		q = q * glm::angleAxis(-1.5708f, glm::vec3(0.0f, 0.0f, 1.0f));
+		glm::vec4 newheadinfo = glm::vec4(q.x, q.y, q.z, q.w);
+
 		caveScene->player1Data.headPos = headPos();
-		caveScene->player1Data.headOrientation = headOrientation();
+		caveScene->player1Data.headOrientation = newheadinfo;
 		caveScene->player1Data.leftHandPos = leftControllerPos();
 		caveScene->player1Data.rightHandPos = rightControllerPos();
 		caveScene->player1Data.leftHandOrientation = leftControllerOrientation();
@@ -903,21 +912,26 @@ protected:
 
 int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
 	int result = -1;
-	
-	LeapApp().run();
 
-	//try {
-	//	if (!OVR_SUCCESS(ovr_Initialize(nullptr))) {
-	//		FAIL("Failed to initialize the Oculus SDK");
-	//	}
-	//	
-	//	result = ExampleApp().run();
-	//}
-	//catch (std::exception & error) {
-	//	OutputDebugStringA(error.what());
-	//	std::cerr << error.what() << std::endl;
-	//}
-	//ovr_Shutdown();
+	c.call("AddPlayer");
+	player = c.call("GetNumPlayers").as<int>();
 
+	if (player == 2) {
+		try {
+			if (!OVR_SUCCESS(ovr_Initialize(nullptr))) {
+				FAIL("Failed to initialize the Oculus SDK");
+			}
+
+			result = ExampleApp().run();
+		}
+		catch (std::exception & error) {
+			OutputDebugStringA(error.what());
+			std::cerr << error.what() << std::endl;
+		}
+		ovr_Shutdown();
+	}
+	else {
+		result = LeapApp(player).run();
+	}
 	return result;
 }

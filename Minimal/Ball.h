@@ -32,15 +32,17 @@ public:
 	Shader shader;
 
 	Ball();
+	Ball(Model ballModel, bool);
 	void Render(glm::mat4 view, glm::mat4 proj, glm::vec3 centerPos);
-
 
 protected:
 
 	// Data
-	GLchar* vertexShaderPath = "./Models/Ball/ball.vs";
-	GLchar* fragShaderPath = "./Models/Ball/ball.frag";
-	GLchar* pathToModel = "./Models/Ball/ball.obj";
+	GLchar* vertexShaderPath_Red = "./Models/ball_red/ball_red.vs";
+	GLchar* fragShaderPath_Red = "./Models/ball_red/ball_red.frag";
+
+	GLchar* vertexShaderPath_Blue = "./Models/ball_blue/ball_blue.vs";
+	GLchar* fragShaderPath_Blue = "./Models/ball_blue/ball_blue.frag";
 
 	glm::vec3 GetPos();
 	glm::vec3 GetScale();

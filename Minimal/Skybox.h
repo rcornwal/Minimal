@@ -32,7 +32,7 @@ public:
 	glm::vec4 rotation;
 	glm::vec3 scale;
 
-	Skybox(bool left, GLfloat dist);
+	Skybox();
 	void Render(glm::mat4 view, glm::mat4 proj);
 	void Render(glm::mat4 view, glm::mat4 proj, GLuint framebuffer);
 	void Draw();

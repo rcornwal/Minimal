@@ -62,6 +62,8 @@ public:
 	void SetXBounds(float minX, float maxX);
 	void SetZBounds(float minZ, float maxZ);
 
+	bool destroyedBall = false;
+
 private:
 	// sphere
 	float radius;
@@ -75,7 +77,9 @@ private:
 	type colliderType;
 	Primitive *colliderObject;
 	float curTime;
+	float curCTime;
 	void SetBlueDelay(float t);
+	void SetColorDelay(Collider*);
 
 protected:
 

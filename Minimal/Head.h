@@ -29,7 +29,7 @@
 #include <GL/glew.h>
 
 
-class Head {
+class Head : public GameObject {
 public:
 
 	Head();
@@ -40,7 +40,11 @@ public:
 	glm::vec3 scale;
 
 	void Render(glm::mat4 view, glm::mat4 proj, glm::vec3 centerPos);
+	glm::vec3 GetPos();
+	glm::vec4 GetRot();
+	glm::vec3 GetScale();
 
+	bool drawHelmet = true;
 private:
 	/* Data */
 	Model headModel;
@@ -50,4 +54,6 @@ private:
 	Shader headShader;
 
 	bool triggerPress = false;
+
+
 };

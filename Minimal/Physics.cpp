@@ -33,8 +33,6 @@ bool Contains(vector<int> v, int num) {
 }
 
 void Physics::Update(const glm::mat4 & projection, const glm::mat4 & modelview) {
-	OutputDebugString(to_string(objects.size()).c_str());
-	OutputDebugString("\n");
 
 	// Update recent collisions
 	for (int i = 0; i < recentCollisions.size(); i++) {

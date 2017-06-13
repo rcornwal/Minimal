@@ -16,6 +16,7 @@
 #include <sstream>
 #include <iostream>
 #include <vector>
+#include <deque>
 
 // GLM includes
 #include <glm/glm.hpp>
@@ -28,6 +29,8 @@
 #include <glm/gtx/quaternion.hpp>
 #include <GL/glew.h>
 
+#define MAX_BALLS 20
+
 struct Ray {
 	glm::vec3 origin;
 	glm::vec3 dir;
@@ -38,6 +41,8 @@ class Gun {
 public:
 
 	Gun();
+
+	deque<Ball*> balls;
 
 	// Positioning
 	glm::vec3 muzzlePos;
@@ -57,10 +62,17 @@ public:
 	glm::vec3 GetScale();
 
 	Ray ray;
+	bool shootRedBalls = false;
 private:
 	/* Data */
 	Laser laser;
 	Model gunModel;
+	Model redBallModel;
+	Model blueBallModel;
+
+	GLchar * pathToBulletModel_Red = "./Models/ball_red/ball_red.obj";
+	GLchar * pathToBulletModel_Blue = "./Models/ball_blue/ball_blue.obj";
+
 	GLchar* pathToGun = "./Models/raygun/raygun.obj";
 	GLchar* vertexShaderPath = "./Models/raygun/raygun.vs";
 	GLchar* fragShaderPath   = "./Models/raygun/raygun.frag";

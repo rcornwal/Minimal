@@ -1,0 +1,13 @@
+# Blender MTL File: 'Coconut_tree.blend'
+# Material Count: 1
+
+newmtl Fence
+Ns 94.117647
+Ka 1.000000 1.000000 1.000000
+Kd 0.452925 0.474146 0.244981
+Ks 0.073655 0.073655 0.073655
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd ./Models/fence/Fence.ppm

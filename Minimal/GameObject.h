@@ -42,9 +42,14 @@ public:
 	void IsStatic(bool isStatic);
 	void SetGravityScale(float gravityScale);
 	void SetContinuousCollision(bool c);
+	void ManualRender(bool);
 	Collider * collider;
 
 private:
+
+	void AddSphereCollider();
+	void AddPlaneCollider();
+	bool overrideRender = false;
 
 protected:
 	virtual glm::vec3 GetPos() { return glm::vec3(0, 0, 0); }
