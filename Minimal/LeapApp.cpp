@@ -96,7 +96,6 @@ int LeapApp::run()
 
 			if (i == 1) {
 				glClear(GL_DEPTH_BUFFER_BIT);
-
 			}
 
 			caveScene->render(project, view * rotate, 1);

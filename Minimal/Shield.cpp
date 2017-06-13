@@ -58,7 +58,7 @@ void Shield::Render(glm::mat4 view, glm::mat4 proj, glm::vec3 centerPos) {
 	glUniformMatrix4fv(glGetUniformLocation(shieldShader.Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
 	glUniformMatrix4fv(glGetUniformLocation(shieldShader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(proj));
 
-	//shieldModel.Draw(shieldShader);
+	shieldModel.Draw(shieldShader);
 }
 
 glm::vec3 Shield::GetPos() {

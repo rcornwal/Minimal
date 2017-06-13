@@ -882,29 +882,33 @@ protected:
 		// pass in info about the hmd to our scene
 
 		glm::vec4 headinfo = headOrientation();
-		glm::quat qh = glm::quat(headinfo.w, headinfo.x, headinfo.y, headinfo.z);
-		glm::quat q = qh * glm::angleAxis(1.5708f, glm::vec3(1.0f, 0.0f, 0.0f));
+		glm::quat q = glm::angleAxis(1.5708f, glm::vec3(1.0f, 0.0f, 0.0f));
 		q = q * glm::angleAxis(1.5708f, glm::vec3(0.0f, 1.0f, 0.0f));
 		q = q * glm::angleAxis(-1.5708f, glm::vec3(0.0f, 0.0f, 1.0f));
-		glm::vec4 newheadinfo = glm::vec4(q.x, q.y, q.z, q.w);
 
-		caveScene->player1Data.headPos = headPos();
-		caveScene->player1Data.headOrientation = newheadinfo;
-		caveScene->player1Data.leftHandPos = leftControllerPos();
-		caveScene->player1Data.rightHandPos = rightControllerPos();
-		caveScene->player1Data.leftHandOrientation = leftControllerOrientation();
-		caveScene->player1Data.rightHandOrientation = rightControllerOrientation();
+		caveScene->player1Data.headPos = glm::mat3(glm::toMat4(q)) * headPos();
+		caveScene->player1Data.headOrientation = adjust(headOrientation(), q);
+		caveScene->player1Data.leftHandPos = glm::mat3(glm::toMat4(q)) * leftControllerPos();
+		caveScene->player1Data.rightHandPos = glm::mat3(glm::toMat4(q)) * rightControllerPos();
+		caveScene->player1Data.leftHandOrientation = adjust(leftControllerOrientation(), q);
+		caveScene->player1Data.rightHandOrientation = adjust(rightControllerOrientation(), q);
 		caveScene->player1Data.triggerSqueezed = triggerSqueezed();
 
 		// get the information about the other player from the server
 		GetServerInformation();
 
 		// render the scene
-		caveScene->render(projection, glm::inverse(headPose), player);
+		caveScene->render(projection, glm::inverse(glm::toMat4(q) * headPose), player);
 
 		// set the updated values back to the server
 		SaveServerInformation();
 
+	}
+
+	glm::vec4 adjust(glm::vec4 original, glm::quat to_rotate) {
+		glm::quat qorig = glm::quat(original.w, original.x, original.y, original.z);
+		glm::quat adjusted = to_rotate * qorig;
+		return glm::vec4(adjusted.x, adjusted.y, adjusted.z, adjusted.w);
 	}
 
 };
