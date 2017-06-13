@@ -1,7 +1,9 @@
 #pragma once
 
 #include "LeapApp.h"
+#include "irrKlang.h"
 
+extern irrklang::ISoundEngine * SoundEngine;
 rpc::client d("localhost", 8080);
 LeapApp::LeapApp(int player) {
 	camera_position = glm::vec3(0, 0, 2.0f);
@@ -79,7 +81,17 @@ int LeapApp::run()
 		caveScene->player1Data.rightHandPos = leap_data.rightHandPos;
 		caveScene->player1Data.leftHandOrientation = leap_data.leftHandOrientation;
 		caveScene->player1Data.rightHandOrientation = leap_data.rightHandOrientation;
-		caveScene->player1Data.triggerSqueezed = leap_data.triggerSqueezed;
+		caveScene->player1Data.triggerSqueezed = leap_data.triggerSqueezed && (d.call("CheckWinState").as<int>() == 0);
+
+		if (d.call("CheckWinState").as<int>() == 1 && !soundplayed) {
+			SoundEngine->play2D("audio/player1wins.mp3", GL_TRUE);
+			soundplayed = true;
+		}
+		else if (d.call("CheckWinState").as<int>() == 2 && !soundplayed) {
+			SoundEngine->play2D("audio/player2wins.mp3", GL_TRUE);
+			soundplayed = true;
+		}
+
 
 		GetServerInformation();
 

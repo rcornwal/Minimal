@@ -20,6 +20,7 @@
 #include <glm/gtx/quaternion.hpp>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include "rpc/client.h"
 
 #define FAIL(X) throw std::runtime_error(X)
 

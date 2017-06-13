@@ -8,6 +8,7 @@
 #include "Head.h"
 #include "Shield.h"
 #include "irrklang.h"
+#include "rpc/client.h"
 
 // Std includes
 #include <stdio.h>
@@ -46,14 +47,15 @@ public:
 	void Render(glm::mat4 view, glm::mat4 proj, glm::vec3 centerPos);
 	void SetPerspectiveFromPlayer();
 	glm::vec3 position;
-
+	bool hasWon;
 
 private:
 	/* Data */
 	Gun gun;
 	Head head;
-	Shield shield;
+	//Shield shield;
 	bool mainPlayer;
+	bool wasHit;
 
 	Ball * hitEffect;
 	Model hitEffectModel;

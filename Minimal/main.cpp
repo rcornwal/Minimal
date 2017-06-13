@@ -727,11 +727,15 @@ protected:
 
 #include "rpc/client.h"
 #include "WinBanner.h"
+#include "irrKlang.h"
+using namespace irrklang;
+ISoundEngine *SoundEngine = createIrrKlangDevice();
 int player = 2;
 
 rpc::client c("localhost", 8080);
 class ExampleApp : public RiftApp {
 	std::shared_ptr<GameScene> caveScene;
+	bool soundplayed = false;
 public:
 	ExampleApp() { }
 
@@ -892,7 +896,16 @@ protected:
 		caveScene->player1Data.rightHandPos = glm::mat3(glm::toMat4(q)) * rightControllerPos();
 		caveScene->player1Data.leftHandOrientation = adjust(leftControllerOrientation(), q);
 		caveScene->player1Data.rightHandOrientation = adjust(rightControllerOrientation(), q);
-		caveScene->player1Data.triggerSqueezed = triggerSqueezed();
+		caveScene->player1Data.triggerSqueezed = triggerSqueezed() && (c.call("CheckWinState").as<int>() == 0);
+
+		if (c.call("CheckWinState").as<int>() == 1 && !soundplayed) {
+			SoundEngine->play2D("audio/player1wins.mp3", GL_TRUE);
+			soundplayed = true;
+		}
+		else if (c.call("CheckWinState").as<int>() == 2 && !soundplayed) {
+			SoundEngine->play2D("audio/player2wins.mp3", GL_TRUE);
+			soundplayed = true;
+		}
 
 		// get the information about the other player from the server
 		GetServerInformation();
@@ -912,10 +925,6 @@ protected:
 	}
 
 };
-
-#include "irrKlang.h"
-using namespace irrklang;
-ISoundEngine *SoundEngine = createIrrKlangDevice();
 
 int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
 	int result = -1;

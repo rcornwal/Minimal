@@ -41,6 +41,8 @@ public:
 	GLfloat deltaTime;
 	GLfloat lastFrame;
 
+	bool soundplayed = false;
+
 	int player;
 	//Create scene to render 
 	std::shared_ptr<GameScene> caveScene;
