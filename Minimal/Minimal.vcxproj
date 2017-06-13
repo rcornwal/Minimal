@@ -172,6 +172,7 @@ xcopy /yr "$(SolutionDir)\lib\ikpMP3.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Skybox.cpp" />
     <ClCompile Include="Sphere.cpp" />
     <ClCompile Include="TexCube.cpp" />
+    <ClCompile Include="Tree.cpp" />
     <ClCompile Include="Wall.cpp" />
     <ClCompile Include="WinBanner.cpp" />
   </ItemGroup>
@@ -211,6 +212,7 @@ xcopy /yr "$(SolutionDir)\lib\ikpMP3.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Sphere.h" />
     <ClInclude Include="StereoScene.h" />
     <ClInclude Include="TexCube.h" />
+    <ClInclude Include="Tree.h" />
     <ClInclude Include="Wall.h" />
     <ClInclude Include="WinBanner.h" />
   </ItemGroup>

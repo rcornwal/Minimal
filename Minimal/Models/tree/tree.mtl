@@ -1,0 +1,26 @@
+# Blender MTL File: 'Coconut_tree.blend'
+# Material Count: 2
+
+newmtl Bark_Coconut
+Ns 96.078431
+Ka 1.000000 1.000000 1.000000
+Kd 0.142401 0.090542 0.033314
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 1
+map_Kd ./Models/tree/Toon_Coconut_Tree.ppm
+map_Bump ./Models/tree/Toon_Coconut_Tree.ppm
+
+newmtl Leaf_Coconut
+Ns 488.235294
+Ka 1.000000 1.000000 1.000000
+Kd 0.488277 0.800000 0.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 0.000000
+illum 1
+map_Kd ./Models/tree/Toon_Coconut_Leaf.ppm
+map_d  ./Models/tree/Toon_Coconut_Leaf.ppm

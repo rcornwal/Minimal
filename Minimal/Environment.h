@@ -33,6 +33,7 @@
 #include "Wall.h"
 #include "Beachball.h"
 #include "Fence.h"
+#include "Tree.h"
 
 class Environment {
 public:
@@ -46,6 +47,10 @@ public:
 	Wall right;
 	Fence rightFence;
 	Beachball beachball;
+	Tree tree1;
+	Tree tree2;
+	Tree tree3;
+	Tree tree4;
 
 	// Place and scale all of our objects
 	Environment() {
@@ -95,6 +100,15 @@ public:
 		rightFence.position = glm::vec3(4.0f, -1.5f, 0.0f);
 		rightFence.scale = glm::vec3(1.0f, 1.0f, 1.0f);
 		rightFence.rotation = glm::vec4(0, 1.0f, 0, -1.5708);
+
+		tree1.position = glm::vec3(4.5f, -1.5f, 4.5f);
+		tree1.scale = glm::vec3(1.0f, 1.0f, 1.0f);
+		tree2.position = glm::vec3(-4.5f, -1.5f, 4.5f);
+		tree2.scale = glm::vec3(1.0f, 1.0f, 1.0f);
+		tree3.position = glm::vec3(4.5f, -1.5f, -4.5f);
+		tree3.scale = glm::vec3(1.0f, 1.0f, 1.0f);
+		tree4.position = glm::vec3(-4.5f, -1.5f, -4.5f);
+		tree4.scale = glm::vec3(1.0f, 1.0f, 1.0f);
 
 		beachball.position = glm::vec3(0, 0, -1.0);
 		beachball.scale = glm::vec3(.25f, .25f, .25f);

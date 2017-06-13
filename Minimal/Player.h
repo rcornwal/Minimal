@@ -53,7 +53,7 @@ private:
 	/* Data */
 	Gun gun;
 	Head head;
-	//Shield shield;
+	Shield shield;
 	bool mainPlayer;
 	bool wasHit;
 

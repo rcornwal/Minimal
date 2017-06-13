@@ -11,9 +11,9 @@ rpc::client p("localhost", 8080);
 Player::Player() {
 	mainPlayer = false;
 
-	//shield.AddCollider(Collider::SphereType);
-	//shield.SetRadius(.1f);
-	//shield.IsStatic(true);
+	shield.AddCollider(Collider::SphereType);
+	shield.SetRadius(.1f);
+	shield.IsStatic(true);
 
 	head.ManualRender(true);
 	head.AddCollider(Collider::SphereType);
@@ -73,10 +73,10 @@ void Player::Render(glm::mat4 view, glm::mat4 proj, glm::vec3 centerPos) {
 	gun.Render(view, proj, centerPos);
 
 	// Position the shiled
-	//shield.position = offsetPos + data.leftHandPos;
-	//shield.rotation = data.leftHandOrientation;
-	//shield.collider->pos = shield.position + centerPos;
-	//shield.collider->rot = shield.rotation;
+	shield.position = offsetPos + data.leftHandPos;
+	shield.rotation = data.leftHandOrientation;
+	shield.collider->pos = shield.position + centerPos;
+	shield.collider->rot = shield.rotation;
 }
 
 void Player::SetPerspectiveFromPlayer() {
